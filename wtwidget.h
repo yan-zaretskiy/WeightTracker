@@ -2,7 +2,6 @@
 #define WTWIDGET_H
 
 #include <QWidget>
-#include <vector>
 #include "weightdatamanager.h"
 #include "weightdataanalyzer.h"
 

@@ -2,7 +2,6 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QDoubleSpinBox>
-#include <QTimer>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
