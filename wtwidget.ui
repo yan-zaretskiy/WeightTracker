@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WTWidget</class>
- <widget class="QWidget" name="WTWidget">
+ <class>WtWidget</class>
+ <widget class="QWidget" name="WtWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
