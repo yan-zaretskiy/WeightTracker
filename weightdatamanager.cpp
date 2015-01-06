@@ -65,7 +65,7 @@ void WeightDataManager::addDataPoint(QDate date, double weight)
     // this function assumes that date is not in the container
     bool isSorted = data_.empty() || date > data_.back().date;
 
-    data_.push_back(DataPoint(date, weight));
+    data_.emplace_back(DataPoint(date, weight));
 
     if(!isSorted)
         std::sort(data_.begin(), data_.end());

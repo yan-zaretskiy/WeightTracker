@@ -7,7 +7,7 @@ class QAction;
 
 namespace weighttracker {
 
-class WTWidget;
+class WtWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -41,7 +41,7 @@ private:
 
     QString strippedName(const QString &fullFileName);
 
-    WTWidget* wtwidget_;
+    WtWidget* wtwidget_;
     QHash<QString,QAction*> actions_;
     static const int maxRecentFiles = 5;
     QAction *recentFileActions_[maxRecentFiles];

@@ -63,7 +63,8 @@ QVariant WeightTableModel::headerData(int section, Qt::Orientation orientation, 
 {
     if (role == Qt::DisplayRole)
     {
-        if (orientation == Qt::Horizontal) {
+        if (orientation == Qt::Horizontal)
+        {
             switch (section)
             {
             case 0:
@@ -113,7 +114,7 @@ void WeightTableModel::modifyWeightAtRow(int row, double weight)
     refreshTrendsStartingAtRow(row);
 
     emit dataChanged(index(row, 1), index(row, 1));
-    emit dataChanged(index(row, 2), index(wdm_.dataSize(), 2));
+    emit dataChanged(index(row, 2), index(wdm_.dataSize()-1, 2));
     emit dataModified();
 }
 
@@ -132,8 +133,11 @@ void WeightTableModel::updateTrends(double tau, double gamma)
 {
     wda_.setTau(tau);
     wda_.setGamma(gamma);
-    refreshTrendsStartingAtRow(0);
-    emit dataChanged(index(0,2), index(wdm_.dataSize(), 2));
+    if (wdm_.dataSize() > 0)
+    {
+        refreshTrendsStartingAtRow(0);
+        emit dataChanged(index(0,2), index(wdm_.dataSize()-1, 2));
+    }
 }
 
 

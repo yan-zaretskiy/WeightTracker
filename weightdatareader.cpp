@@ -31,7 +31,7 @@ bool XMLReader::read(WeightDataManager &wdm)
                 double value = xml.readElementText().toDouble(&correctDouble);
 
                 if (date.isValid() && correctDouble)
-                    temp.push_back(DataPoint(date, value));
+                    temp.emplace_back(DataPoint(date, value));
                 else
                     return false;
             }

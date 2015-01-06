@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QDoubleSpinBox>
+#include <QTimer>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
@@ -12,9 +13,9 @@
 
 namespace weighttracker {
 
-WTWidget::WTWidget(QWidget *parent) :
+WtWidget::WtWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::WTWidget),
+    ui(new Ui::WtWidget),
     wdm_(), wda_(), model_(nullptr), dialog_(nullptr)
 {
     ui->setupUi(this);
@@ -27,8 +28,8 @@ WTWidget::WTWidget(QWidget *parent) :
 
     model_ = new WeightTableModel(wdm_, wda_);
     connect(model_, SIGNAL(dataModified()), this, SIGNAL(dataModified()));
-    connect(ui->removeRowButton, &QPushButton::clicked, this, &WTWidget::removeSelectedRows);
-    connect(ui->addRowButton, &QPushButton::clicked, this, &WTWidget::invokeAddDataDialog);
+    connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
+    connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -38,38 +39,39 @@ WTWidget::WTWidget(QWidget *parent) :
 }
 
 
-WTWidget::~WTWidget()
+WtWidget::~WtWidget()
 {
     delete ui;
 }
 
 
-bool WTWidget::readFile(const QString &fileName)
+bool WtWidget::readFile(const QString &fileName)
 {
-    return model_->readFile(fileName);
+    auto result = model_->readFile(fileName);
     ui->weightDataView->scrollToBottom();
+    return result;
 }
 
 
-bool WTWidget::writeFile(const QString &fileName)
+bool WtWidget::writeFile(const QString &fileName)
 {
     return model_->writeFile(fileName);
 }
 
 
-void WTWidget::clear()
+void WtWidget::clear()
 {
     model_->clear();
 }
 
 
-void WTWidget::updateTrends()
+void WtWidget::updateTrends()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
 }
 
 
-void WTWidget::removeSelectedRows()
+void WtWidget::removeSelectedRows()
 {
     QModelIndexList rows = ui->weightDataView->selectionModel()->selectedRows();
     if (rows.isEmpty()) return;
@@ -89,13 +91,13 @@ void WTWidget::removeSelectedRows()
 }
 
 
-void WTWidget::invokeAddDataDialog()
+void WtWidget::invokeAddDataDialog()
 {
     if(!dialog_)
     {
         dialog_ = new AddDataDialog(this);
-        //dialog->setModal(true);
-        connect(dialog_, &AddDataDialog::requestDataInput, this, &WTWidget::possiblyAddRow);
+        dialog_->setModal(true);
+        connect(dialog_, &AddDataDialog::requestDataInput, this, &WtWidget::possiblyAddRow);
     }
     dialog_->clearInput();
     dialog_->setFocusOnDateEdit();
@@ -103,7 +105,7 @@ void WTWidget::invokeAddDataDialog()
 }
 
 
-void WTWidget::possiblyAddRow(QDate date, double weight)
+void WtWidget::possiblyAddRow(QDate date, double weight)
 {
     auto result = wdm_.hasDate(date);
     int position = result.second;
@@ -113,7 +115,7 @@ void WTWidget::possiblyAddRow(QDate date, double weight)
                         tr("The record for %1 already exists.\n"
                            "Do you want to overwrite an old value\n"
                            "of %2 with a new value of %3?").arg(date.toString("MM/dd/yyyy"))
-                                                           .arg(wdm_.getData().at(position).value)
+                                                           .arg(wdm_.at(position).value)
                                                            .arg(weight),
                         QMessageBox::Yes | QMessageBox::No);
 
@@ -130,7 +132,10 @@ void WTWidget::possiblyAddRow(QDate date, double weight)
         model_->modifyWeightAtRow(position, weight);
     }
     else
+    {
         model_->insertRowAt(position, date, weight);
+        ui->weightDataView->scrollToBottom();
+    }
 }
 
 

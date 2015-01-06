@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     readSettings();
     setCurrentFile("");
-    wtwidget_ = new WTWidget(this);
+    wtwidget_ = new WtWidget(this);
     setCentralWidget(wtwidget_);
     connect(wtwidget_, SIGNAL(dataModified()), this, SLOT(weightTableModified()));
 }

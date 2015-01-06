@@ -26,7 +26,8 @@ HEADERS += \
     adddatadialog.h \
     weightdatareader.h \
     weightdatawriter.h \
-    mainwindow.h
+    mainwindow.h \
+    settings.h
 
 CONFIG += c++11
 
@@ -34,5 +35,4 @@ FORMS += \
     wtwidget.ui \
     adddatadialog.ui
 
-RESOURCES = weighttracker.qrc \
-    weighttracker.qrc
+RESOURCES = weighttracker.qrc

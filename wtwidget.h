@@ -8,7 +8,7 @@
 
 
 namespace Ui {
-class WTWidget;
+class WtWidget;
 }
 
 namespace weighttracker {
@@ -16,13 +16,13 @@ namespace weighttracker {
 class WeightTableModel;
 class AddDataDialog;
 
-class WTWidget : public QWidget
+class WtWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WTWidget(QWidget *parent = 0);
-    ~WTWidget();
+    explicit WtWidget(QWidget *parent = 0);
+    ~WtWidget();
 
     bool readFile(const QString& fileName);
     bool writeFile(const QString& fileName);
@@ -38,7 +38,7 @@ private slots:
     void possiblyAddRow(QDate date, double weight);
 
 private:
-    Ui::WTWidget* ui;
+    Ui::WtWidget* ui;
 
     WeightDataManager wdm_;
     WeightDataAnalyzer wda_;
