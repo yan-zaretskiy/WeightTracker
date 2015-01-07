@@ -142,7 +142,7 @@ bool MainWindow::okToContinue()
                         tr("The document has been modified.\n"
                            "Do you want to save your changes?"),
                         QMessageBox::Yes | QMessageBox::No
-                        | QMessageBox::Cancel);
+                        | QMessageBox::Cancel, QMessageBox::No);
         if (r == QMessageBox::Yes)
             return save();
         else if (r == QMessageBox::Cancel)

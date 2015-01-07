@@ -27,6 +27,9 @@ public:
     bool writeFile(const QString& fileName);
     void clear();
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private slots:
     void updateTrends();
     void removeSelectedRows();

@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QDoubleSpinBox>
+#include <QKeyEvent>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
@@ -35,6 +36,7 @@ WtWidget::WtWidget(QWidget *parent) :
     ui->weightDataView->horizontalHeader()->setHighlightSections(false);
     ui->weightDataView->resizeColumnsToContents();
     ui->weightDataView->verticalHeader()->setVisible(false);
+    ui->weightDataView->installEventFilter(this);
 }
 
 
@@ -64,6 +66,25 @@ void WtWidget::clear()
 }
 
 
+bool WtWidget::eventFilter(QObject *object, QEvent *event)
+{
+    if(object == ui->weightDataView)
+    {
+        if (event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->key() == Qt::Key_Delete)
+            {
+                removeSelectedRows();
+                return true;
+            }
+            else return false;
+        }
+    }
+    return QWidget::eventFilter(object, event);
+}
+
+
 void WtWidget::updateTrends()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
@@ -81,7 +102,7 @@ void WtWidget::removeSelectedRows()
     int r = QMessageBox::question(this, tr("Weight Tracker"),
                     tr("Are you sure you want to remove %1 %2?").arg(count)
                                                                 .arg(count > 1 ? "rows" : "row"),
-                    QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
     if (r == QMessageBox::Yes)
         model_->removeRows(first, count);
@@ -116,7 +137,7 @@ void WtWidget::possiblyAddRow(QDate date, double weight)
                            "of %2 with a new value of %3?").arg(date.toString("MM/dd/yyyy"))
                                                            .arg(wdm_.at(position).value)
                                                            .arg(weight),
-                        QMessageBox::Yes | QMessageBox::No);
+                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
         if (r == QMessageBox::No)
         {
