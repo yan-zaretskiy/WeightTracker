@@ -46,15 +46,15 @@ void MainWindow::newFile()
 
 bool MainWindow::open()
 {
+    bool result = false;
     if (okToContinue())
     {
         QString fileName = QFileDialog::getOpenFileName(this,
                                    tr("Open Weight Table"), ".",
                                    tr("Weight Table files (*.wt)"));
-        if (!fileName.isEmpty())
-            return loadFile(fileName);
+        result = !fileName.isEmpty() && loadFile(fileName);
     }
-    return false;
+    return result;
 }
 
 
@@ -69,10 +69,8 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this,
                                tr("Save Weight Table"), ".",
                                tr("Weight Table files (*.wt)"));
-    if (fileName.isEmpty())
-        return false;
 
-    return saveFile(fileName);
+    return !fileName.isEmpty() && saveFile(fileName);
 }
 
 
@@ -156,21 +154,19 @@ bool MainWindow::okToContinue()
 
 bool MainWindow::loadFile(const QString &fileName)
 {
-    if (!(wtwidget_->readFile(fileName)))
-        return false;
+    bool isReadOK = wtwidget_->readFile(fileName);
+    if (isReadOK) setCurrentFile(fileName);
 
-    setCurrentFile(fileName);
-    return true;
+    return isReadOK;
 }
 
 
 bool MainWindow::saveFile(const QString &fileName)
 {
-    if (!(wtwidget_->writeFile(fileName)))
-        return false;
+    bool isWriteOK = wtwidget_->writeFile(fileName);
+    if (isWriteOK) setCurrentFile(fileName);
 
-    setCurrentFile(fileName);
-    return true;
+    return isWriteOK;
 }
 
 

@@ -46,7 +46,7 @@ WtWidget::~WtWidget()
 
 bool WtWidget::readFile(const QString &fileName)
 {
-    auto result = model_->readFile(fileName);
+    bool result = model_->readFile(fileName);
     ui->weightDataView->scrollToBottom();
     return result;
 }
