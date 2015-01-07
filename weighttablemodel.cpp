@@ -157,8 +157,7 @@ bool WeightTableModel::readFile(const QString &fileName)
     bool result = reader->read(wdm_);
     refreshTrendsStartingAtRow(0);
     endResetModel();
-    if (result)
-        emit dataModified();
+
     return result;
 }
 

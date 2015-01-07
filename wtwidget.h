@@ -27,9 +27,6 @@ public:
     bool writeFile(const QString& fileName);
     void clear();
 
-signals:
-    void dataModified();
-
 private slots:
     void updateTrends();
     void removeSelectedRows();

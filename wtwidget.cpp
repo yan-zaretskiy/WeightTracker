@@ -26,7 +26,7 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrends()));
 
     model_ = new WeightTableModel(wdm_, wda_);
-    connect(model_, SIGNAL(dataModified()), this, SIGNAL(dataModified()));
+    connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified()));
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
