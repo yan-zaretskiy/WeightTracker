@@ -1,0 +1,7 @@
+TODO: edit seleceted row on key event
+TODO: unselect selected row on click
+TODO: undo/redo functionality
+TODO: add weight units option, kg/lbs
+
+============ PLOTTING============
+TODO: buttons above a graph for duration of a plot (i.e. length of an X axis)
