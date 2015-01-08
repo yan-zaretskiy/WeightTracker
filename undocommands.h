@@ -2,20 +2,23 @@
 #define UNDOCOMMANDS
 
 #include <QUndoCommand>
+#include "datapoint.h"
 
 namespace weighttracker {
 
-class AddShapeCommand : public QUndoCommand
+class WeightTableModel;
+
+class RemoveRowCommand : public QUndoCommand
 {
 public:
-    AddShapeCommand(Document *doc, const Shape &shape, QUndoCommand *parent = 0);
-    void undo() Q_DECL_OVERRIDE;
-    void redo() Q_DECL_OVERRIDE;
+    RemoveRowCommand(QUndoCommand *parent = 0, WeightTableModel *model, int row);
+    void undo() override;
+    void redo() override;
 
 private:
-    Document *m_doc;
-    Shape m_shape;
-    QString m_shapeName;
+    WeightTableModel* model_;
+    int row_;
+    DataPoint dp_;
 };
 
 }

@@ -16,7 +16,8 @@ SOURCES += \
     weightdatareader.cpp \
     weightdatawriter.cpp \
     mainwindow.cpp \
-    weighttablemodelio.cpp
+    weighttablemodelio.cpp \
+    undocommands.cpp
 
 HEADERS += \
     weightdatamanager.h \

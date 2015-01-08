@@ -28,7 +28,7 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
     model_ = new WeightTableModel(wdm_, wda_);
-    connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified()));
+    connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified())); // this will go away when undo stack is available
     connect(parent, SIGNAL(clearModelRequested()), model_, SLOT(clear()));
 
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
