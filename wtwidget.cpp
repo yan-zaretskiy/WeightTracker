@@ -8,6 +8,7 @@
 #include "ui_wtwidget.h"
 #include "weightdataanalyzer.h"
 #include "weighttablemodel.h"
+#include "weighttablemodelio.h"
 #include "adddatadialog.h"
 
 
@@ -23,11 +24,13 @@ WtWidget::WtWidget(QWidget *parent) :
     wda_.setTau(ui->tauSpinBox->value());
     wda_.setGamma(ui->gammaSpinBox->value());
 
-    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrends()));
-    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrends()));
+    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
+    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
     model_ = new WeightTableModel(wdm_, wda_);
     connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified()));
+    connect(parent, SIGNAL(clearModelRequested()), model_, SLOT(clear()));
+
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
@@ -48,21 +51,16 @@ WtWidget::~WtWidget()
 
 bool WtWidget::readFile(const QString &fileName)
 {
-    bool result = model_->readFile(fileName);
+    bool result = WeightTableModelIO::populateModelFromFile(model_, fileName);
     ui->weightDataView->scrollToBottom();
+
     return result;
 }
 
 
 bool WtWidget::writeFile(const QString &fileName)
 {
-    return model_->writeFile(fileName);
-}
-
-
-void WtWidget::clear()
-{
-    model_->clear();
+    return WeightTableModelIO::writeModelToFile(model_, fileName);
 }
 
 
@@ -85,7 +83,7 @@ bool WtWidget::eventFilter(QObject *object, QEvent *event)
 }
 
 
-void WtWidget::updateTrends()
+void WtWidget::requestTrendsUpdate()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
 }

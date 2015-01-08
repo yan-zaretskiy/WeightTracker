@@ -15,7 +15,8 @@ SOURCES += \
     adddatadialog.cpp \
     weightdatareader.cpp \
     weightdatawriter.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    weighttablemodelio.cpp
 
 HEADERS += \
     weightdatamanager.h \
@@ -27,7 +28,9 @@ HEADERS += \
     weightdatareader.h \
     weightdatawriter.h \
     mainwindow.h \
-    settings.h
+    settings.h \
+    weighttablemodelio.h \
+    undocommands.h
 
 CONFIG += c++11
 

@@ -8,10 +8,13 @@ namespace weighttracker {
 
 class WeightDataManager;
 class WeightDataAnalyzer;
+class WeightTableModelIO;
 
 class WeightTableModel : public QAbstractTableModel
 {
     Q_OBJECT
+
+    friend class WeightTableModelIO;
 
 public:
     WeightTableModel(WeightDataManager& wdm,
@@ -32,9 +35,9 @@ public:
     void modifyWeightAtRow(int row, double weight);
     void insertRowAt(int row, QDate date, double weight);
     void updateTrends(double tau, double gamma);
+
+public slots:
     void clear();
-    bool readFile(const QString& fileName);
-    bool writeFile(const QString& fileName);
 
 signals:
     void dataModified();

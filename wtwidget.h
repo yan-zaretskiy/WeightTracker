@@ -25,13 +25,12 @@ public:
 
     bool readFile(const QString& fileName);
     bool writeFile(const QString& fileName);
-    void clear();
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
-    void updateTrends();
+    void requestTrendsUpdate();
     void removeSelectedRows();
     void invokeAddDataDialog();
     void possiblyAddRow(QDate date, double weight);

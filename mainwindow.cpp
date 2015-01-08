@@ -38,7 +38,7 @@ void MainWindow::newFile()
 {
     if (okToContinue())
     {
-        wtwidget_->clear();
+        emit clearModelRequested();
         setCurrentFile("");
     }
 }

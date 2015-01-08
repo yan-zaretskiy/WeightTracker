@@ -1,12 +1,8 @@
 #include <QLocale>
-#include <memory>
 
 #include "weighttablemodel.h"
 #include "weightdatamanager.h"
 #include "weightdataanalyzer.h"
-#include "weightdatareader.h"
-#include "weightdatawriter.h"
-
 
 namespace weighttracker {
 
@@ -147,25 +143,6 @@ void WeightTableModel::clear()
     wdm_.clear();
     refreshTrendsStartingAtRow(0);
     endResetModel();
-}
-
-
-bool WeightTableModel::readFile(const QString &fileName)
-{
-    std::unique_ptr<WeightDataReader> reader(new XMLReader(fileName));
-    beginResetModel();
-    bool result = reader->read(wdm_);
-    refreshTrendsStartingAtRow(0);
-    endResetModel();
-
-    return result;
-}
-
-
-bool WeightTableModel::writeFile(const QString &fileName)
-{
-    std::unique_ptr<WeightDataWriter> writer(new XMLWriter(fileName));
-    return writer->write(wdm_);
 }
 
 
