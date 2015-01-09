@@ -19,7 +19,7 @@ namespace weighttracker {
 WtWidget::WtWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WtWidget),
-    wdm_(), wda_(), model_(nullptr), dialog_(nullptr)
+    wdm_(), wda_(), model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
 {
     ui->setupUi(this);
 
@@ -29,6 +29,7 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
+    undoStack_ = new QUndoStack(this);
     model_ = new WeightTableModel(wdm_, wda_, undoStack_);
     connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified())); // this will go away when undo stack is available
 
