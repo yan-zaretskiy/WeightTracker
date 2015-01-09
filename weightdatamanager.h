@@ -29,7 +29,8 @@ public:
     WeightDataManager();
     ~WeightDataManager() = default;
 
-    const std::vector<DataPoint>& getData() const;
+    void setData(DataVector&& data);
+    const DataVector& getData() const;
     const DataPoint& at(size_t i) const;
     void clear();
     int dataSize() const;

@@ -12,7 +12,7 @@ public:
     WeightDataAnalyzer() : trend_(0), tau_(0.0), gamma_(0.0) {}
     ~WeightDataAnalyzer() = default;
 
-    void computeTrendValues(const std::vector<DataPoint>& weightData, int position);
+    void computeTrendValues(const DataVector &weightData, int position);
 
     const std::vector<double>& trend() const { return trend_; }
 

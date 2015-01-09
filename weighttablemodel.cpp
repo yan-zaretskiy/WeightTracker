@@ -137,6 +137,21 @@ void WeightTableModel::updateTrends(double tau, double gamma)
 }
 
 
+void WeightTableModel::setData(DataVector&& data)
+{
+    beginResetModel();
+    wdm_.setData(std::move(data));
+    refreshTrendsStartingAtRow(0);
+    endResetModel();
+}
+
+
+const DataVector &WeightTableModel::getData() const
+{
+    return wdm_.getData();
+}
+
+
 void WeightTableModel::clearData()
 {
     beginResetModel();
@@ -170,16 +185,6 @@ bool WeightTableModel::removeRows(int first, int count, const QModelIndex &paren
 
     return true;
 }
-
-
-class WeightTableModel::WtModelAttorney
-{
-    friend class WeightTableModelIO;
-    static void beginResetModel(WeightTableModel& model) { model.beginResetModel(); }
-    static void endResetModel(WeightTableModel& model) { model.endResetModel(); }
-    static WeightDataManager& getWdManager(WeightTableModel& model) { return model.getWdManager(); }
-    static void refreshTrendsStartingAtRow(WeightTableModel& model, int row) { model.refreshTrendsStartingAtRow(row); }
-};
 
 
 } // namespace weighttracker

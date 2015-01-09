@@ -6,7 +6,13 @@ namespace weighttracker {
 WeightDataManager::WeightDataManager() : data_(0) { data_.reserve(10); }
 
 
-const std::vector<DataPoint>& WeightDataManager::getData() const
+void WeightDataManager::setData(DataVector&& data)
+{
+    data_ = std::move(data);
+}
+
+
+const DataVector &WeightDataManager::getData() const
 {
     return data_;
 }
@@ -16,6 +22,7 @@ const DataPoint& WeightDataManager::at(size_t i) const
 {
     return data_.at(i);
 }
+
 
 void WeightDataManager::clear()
 {

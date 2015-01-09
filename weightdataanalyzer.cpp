@@ -30,7 +30,7 @@ void WeightDataAnalyzer::setGamma(double gamma)
 }
 
 
-void WeightDataAnalyzer::computeTrendValues(const std::vector<DataPoint> &weightData, int position)
+void WeightDataAnalyzer::computeTrendValues(const DataVector &weightData, int position)
 {
     if (weightData.size() == 0)
     {

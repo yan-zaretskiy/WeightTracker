@@ -11,14 +11,14 @@ namespace weighttracker {
 XMLReader::XMLReader(QString filename) : file_(filename)
 { }
 
-bool XMLReader::read(WeightDataManager &wdm)
+bool XMLReader::read(DataVector &data)
 {
     bool open = file_.open(QIODevice::ReadOnly | QIODevice::Text);
     if (!open)
         return false;
     else
     {
-        std::vector<DataPoint> temp;
+        data.clear();
         QXmlStreamReader xml(&file_);
         while (!xml.atEnd())
         {
@@ -31,15 +31,11 @@ bool XMLReader::read(WeightDataManager &wdm)
                 double value = xml.readElementText().toDouble(&correctDouble);
 
                 if (date.isValid() && correctDouble)
-                    temp.emplace_back(DataPoint(date, value));
+                    data.emplace_back(DataPoint(date, value));
                 else
                     return false;
             }
         }
-
-        wdm.clear();
-        for (auto& dp: temp)
-            wdm.addDataPoint(dp.date, dp.value);
 
         file_.close();
         return true;

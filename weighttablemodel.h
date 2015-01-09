@@ -3,6 +3,7 @@
 
 #include <QAbstractTableModel>
 #include <vector>
+#include "datapoint.h"
 
 namespace weighttracker {
 
@@ -33,9 +34,9 @@ public:
     void modifyWeightAtRow(int row, double weight);
     void insertRowAt(int row, QDate date, double weight);
     void updateTrends(double tau, double gamma);
+    void setData(DataVector&& data);
+    const DataVector& getData() const;
     void clearData();
-
-    class WtModelAttorney;
 
 signals:
     void dataModified();

@@ -50,7 +50,7 @@ WtWidget::~WtWidget()
 
 bool WtWidget::readFile(const QString &fileName)
 {
-    bool result = WeightTableModelIO::populateModelFromFile(model_, fileName);
+    bool result = WeightTableModelIO::populateModelFromFile(*model_, fileName);
     ui->weightDataView->scrollToBottom();
 
     return result;
@@ -59,7 +59,7 @@ bool WtWidget::readFile(const QString &fileName)
 
 bool WtWidget::writeFile(const QString &fileName)
 {
-    return WeightTableModelIO::writeModelToFile(model_, fileName);
+    return WeightTableModelIO::writeModelToFile(*model_, fileName);
 }
 
 void WtWidget::clearModel()

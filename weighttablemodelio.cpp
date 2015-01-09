@@ -7,13 +7,10 @@ namespace weighttracker {
 
 bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QString &fileName)
 {
-    typedef WeightTableModel::WtModelAttorney Attorney;
     XMLReader reader(fileName);
-    Attorney::beginResetModel(model);
-    Attorney::beginResetModel(model);
-    bool result = reader.read(Attorney::getWdManager(model));
-    Attorney::refreshTrendsStartingAtRow(model, 0);
-    Attorney::endResetModel(model);
+    std::vector<DataPoint> data;
+    bool result = reader.read(data);
+    model.setData(std::move(data));
 
     return result;
 }
@@ -21,8 +18,8 @@ bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QS
 
 bool WeightTableModelIO::writeModelToFile(WeightTableModel& model, const QString &fileName)
 {
-    XMLReader writer(fileName);
-    return writer.write(Attorney::getWdManager(model));
+    XMLWriter writer(fileName);
+    return writer.write(model.getData());
 }
 
 }

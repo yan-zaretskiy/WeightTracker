@@ -11,7 +11,7 @@ namespace weighttracker {
 XMLWriter::XMLWriter(QString filename) : file_(filename)
 { }
 
-bool XMLWriter::write(WeightDataManager &wdm)
+bool XMLWriter::write(const DataVector &data)
 {
     bool open = file_.open(QIODevice::WriteOnly | QIODevice::Text);
     if (!open)
@@ -21,9 +21,8 @@ bool XMLWriter::write(WeightDataManager &wdm)
         QXmlStreamWriter xml(&file_);
         xml.setAutoFormatting(true);
         xml.writeStartDocument();
-        auto weightData = wdm.getData();
         xml.writeStartElement("weight_points");
-        for (auto& el : weightData)
+        for (auto& el : data)
         {
             xml.writeStartElement("weight");
             xml.writeAttribute("date", QLocale().toString(el.date, QLocale::ShortFormat));
