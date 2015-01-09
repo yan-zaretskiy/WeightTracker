@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QDoubleSpinBox>
 #include <QKeyEvent>
+#include <QUndoStack>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
@@ -10,6 +11,7 @@
 #include "weighttablemodel.h"
 #include "weighttablemodelio.h"
 #include "adddatadialog.h"
+#include "undocommands.h"
 
 
 namespace weighttracker {
@@ -27,7 +29,7 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
-    model_ = new WeightTableModel(wdm_, wda_);
+    model_ = new WeightTableModel(wdm_, wda_, undoStack_);
     connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified())); // this will go away when undo stack is available
 
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
@@ -62,9 +64,16 @@ bool WtWidget::writeFile(const QString &fileName)
     return WeightTableModelIO::writeModelToFile(*model_, fileName);
 }
 
+
 void WtWidget::clearModel()
 {
-    model_->clearData();
+    model_->clearWeightData();
+}
+
+
+QUndoStack* WtWidget::undoStack() const
+{
+    return undoStack_;
 }
 
 
@@ -107,7 +116,7 @@ void WtWidget::removeSelectedRows()
                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
     if (r == QMessageBox::Yes)
-        model_->removeRows(first, count);
+        undoStack_->push(new RemoveRowCommand(model_, first));
     else
         ui->weightDataView->setFocus();
 }
@@ -151,11 +160,11 @@ void WtWidget::possiblyAddRow(QDate date, double weight)
             }
             return;
         }
-        model_->modifyWeightAtRow(position, weight);
+        undoStack_->push(new ModifyRowCommand(model_, position, weight));
     }
     else
     {
-        model_->insertRowAt(position, date, weight);
+        undoStack_->push(new AddRowCommand(model_, position, date, weight));
         ui->weightDataView->scrollToBottom();
     }
 }

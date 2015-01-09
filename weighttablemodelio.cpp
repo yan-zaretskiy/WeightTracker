@@ -10,7 +10,7 @@ bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QS
     XMLReader reader(fileName);
     std::vector<DataPoint> data;
     bool result = reader.read(data);
-    model.setData(std::move(data));
+    model.setWeightData(std::move(data));
 
     return result;
 }
@@ -19,7 +19,7 @@ bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QS
 bool WeightTableModelIO::writeModelToFile(WeightTableModel& model, const QString &fileName)
 {
     XMLWriter writer(fileName);
-    return writer.write(model.getData());
+    return writer.write(model.getWeightData());
 }
 
 }

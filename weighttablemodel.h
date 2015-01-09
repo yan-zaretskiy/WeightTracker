@@ -5,11 +5,12 @@
 #include <vector>
 #include "datapoint.h"
 
+class QUndoStack;
+
 namespace weighttracker {
 
 class WeightDataManager;
 class WeightDataAnalyzer;
-class WeightTableModelIO;
 
 class WeightTableModel : public QAbstractTableModel
 {
@@ -18,8 +19,9 @@ class WeightTableModel : public QAbstractTableModel
 public:
     WeightTableModel(WeightDataManager& wdm,
                      WeightDataAnalyzer& wda,
+                     QUndoStack* undoStack,
                      QObject* parent = 0)
-    : QAbstractTableModel(parent), wdm_(wdm), wda_(wda) {}
+    : QAbstractTableModel(parent), wdm_(wdm), wda_(wda), undoStack_(undoStack) {}
 
     ~WeightTableModel() = default;
 
@@ -34,9 +36,9 @@ public:
     void modifyWeightAtRow(int row, double weight);
     void insertRowAt(int row, QDate date, double weight);
     void updateTrends(double tau, double gamma);
-    void setData(DataVector&& data);
-    const DataVector& getData() const;
-    void clearData();
+    void setWeightData(DataVector&& data);
+    const DataVector& getWeightData() const;
+    void clearWeightData();
 
 signals:
     void dataModified();
@@ -46,6 +48,7 @@ private:
     WeightDataManager& getWdManager();
     WeightDataManager& wdm_;
     WeightDataAnalyzer& wda_;
+    QUndoStack* undoStack_;
 };
 
 } // namespace weighttracker

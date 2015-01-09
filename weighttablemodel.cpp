@@ -1,8 +1,10 @@
 #include <QLocale>
+#include <QUndoStack>
 
 #include "weighttablemodel.h"
 #include "weightdatamanager.h"
 #include "weightdataanalyzer.h"
+#include "undocommands.h"
 
 namespace weighttracker {
 
@@ -84,7 +86,7 @@ bool WeightTableModel::setData(const QModelIndex &index, const QVariant &value, 
         double weight = value.toDouble(&weightIsValid);
         if (weightIsValid && weight >= 0.0 && weight <= 1000.0)
         {
-            modifyWeightAtRow(index.row(), weight);
+            undoStack_->push(new ModifyRowCommand(this, index.row(), weight));
             return true;
         }
     }
@@ -129,15 +131,13 @@ void WeightTableModel::updateTrends(double tau, double gamma)
 {
     wda_.setTau(tau);
     wda_.setGamma(gamma);
+    refreshTrendsStartingAtRow(0);
     if (wdm_.dataSize() > 0)
-    {
-        refreshTrendsStartingAtRow(0);
         emit dataChanged(index(0,2), index(wdm_.dataSize()-1, 2));
-    }
 }
 
 
-void WeightTableModel::setData(DataVector&& data)
+void WeightTableModel::setWeightData(DataVector&& data)
 {
     beginResetModel();
     wdm_.setData(std::move(data));
@@ -146,13 +146,13 @@ void WeightTableModel::setData(DataVector&& data)
 }
 
 
-const DataVector &WeightTableModel::getData() const
+const DataVector &WeightTableModel::getWeightData() const
 {
     return wdm_.getData();
 }
 
 
-void WeightTableModel::clearData()
+void WeightTableModel::clearWeightData()
 {
     beginResetModel();
     wdm_.clear();

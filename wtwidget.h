@@ -10,6 +10,8 @@ namespace Ui {
 class WtWidget;
 }
 
+class QUndoStack;
+
 namespace weighttracker {
 
 class WeightTableModel;
@@ -26,6 +28,7 @@ public:
     bool readFile(const QString& fileName);
     bool writeFile(const QString& fileName);
     void clearModel();
+    QUndoStack* undoStack() const;
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
@@ -43,7 +46,7 @@ private:
     WeightDataAnalyzer wda_;
     WeightTableModel* model_;
     AddDataDialog* dialog_;
-
+    QUndoStack* undoStack_;
 };
 
 } // namespace weighttracker

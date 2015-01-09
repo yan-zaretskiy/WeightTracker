@@ -15,7 +15,7 @@ class WeightTableModel;
 class RemoveRowCommand : public QUndoCommand
 {
 public:
-    RemoveRowCommand(QUndoCommand *parent = 0, WeightTableModel *model, int row);
+    RemoveRowCommand(WeightTableModel *model, int row, QUndoCommand *parent = 0);
     void undo() override;
     void redo() override;
 
@@ -32,7 +32,7 @@ private:
 class AddRowCommand : public QUndoCommand
 {
 public:
-    AddRowCommand(QUndoCommand *parent = 0, WeightTableModel *model, int row, DataPoint dp);
+    AddRowCommand(WeightTableModel *model, int row, QDate date, double weight, QUndoCommand *parent = 0);
     void undo() override;
     void redo() override;
 
@@ -49,14 +49,14 @@ private:
 class ModifyRowCommand : public QUndoCommand
 {
 public:
-    ModifyRowCommand(QUndoCommand *parent = 0, WeightTableModel *model, int row, double weight);
+    ModifyRowCommand(WeightTableModel *model, int row, double weight, QUndoCommand *parent = 0);
     void undo() override;
     void redo() override;
 
 private:
     WeightTableModel* model_;
     int row_;
-    double weight_;
+    double oldWeight_, newWeight_;
 };
 
 }
