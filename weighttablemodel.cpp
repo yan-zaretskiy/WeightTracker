@@ -137,7 +137,7 @@ void WeightTableModel::updateTrends(double tau, double gamma)
 }
 
 
-void WeightTableModel::clear()
+void WeightTableModel::clearData()
 {
     beginResetModel();
     wdm_.clear();
@@ -149,6 +149,12 @@ void WeightTableModel::clear()
 void WeightTableModel::refreshTrendsStartingAtRow(int row)
 {
     wda_.computeTrendValues(wdm_.getData(), row);
+}
+
+
+WeightDataManager &WeightTableModel::getWdManager()
+{
+     return wdm_;
 }
 
 
@@ -164,5 +170,16 @@ bool WeightTableModel::removeRows(int first, int count, const QModelIndex &paren
 
     return true;
 }
+
+
+class WeightTableModel::WtModelAttorney
+{
+    friend class WeightTableModelIO;
+    static void beginResetModel(WeightTableModel& model) { model.beginResetModel(); }
+    static void endResetModel(WeightTableModel& model) { model.endResetModel(); }
+    static WeightDataManager& getWdManager(WeightTableModel& model) { return model.getWdManager(); }
+    static void refreshTrendsStartingAtRow(WeightTableModel& model, int row) { model.refreshTrendsStartingAtRow(row); }
+};
+
 
 } // namespace weighttracker

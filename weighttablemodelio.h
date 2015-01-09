@@ -13,8 +13,8 @@ public:
     WeightTableModelIO() = default;
     ~WeightTableModelIO() = default;
 
-    static bool populateModelFromFile(WeightTableModel* model, const QString& fileName);
-    static bool writeModelToFile(WeightTableModel* model, const QString& fileName);
+    static bool populateModelFromFile(WeightTableModel& model, const QString& fileName);
+    static bool writeModelToFile(WeightTableModel& model, const QString& fileName);
 };
 
 }

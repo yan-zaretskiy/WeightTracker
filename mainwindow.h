@@ -19,9 +19,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 
-signals:
-    void clearModelRequested();
-
 private slots:
     void newFile();
     bool open();

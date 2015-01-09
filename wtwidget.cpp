@@ -29,7 +29,6 @@ WtWidget::WtWidget(QWidget *parent) :
 
     model_ = new WeightTableModel(wdm_, wda_);
     connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified())); // this will go away when undo stack is available
-    connect(parent, SIGNAL(clearModelRequested()), model_, SLOT(clear()));
 
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
@@ -61,6 +60,11 @@ bool WtWidget::readFile(const QString &fileName)
 bool WtWidget::writeFile(const QString &fileName)
 {
     return WeightTableModelIO::writeModelToFile(model_, fileName);
+}
+
+void WtWidget::clearModel()
+{
+    model_->clearData();
 }
 
 

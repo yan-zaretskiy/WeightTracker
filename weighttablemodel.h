@@ -14,8 +14,6 @@ class WeightTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    friend class WeightTableModelIO;
-
 public:
     WeightTableModel(WeightDataManager& wdm,
                      WeightDataAnalyzer& wda,
@@ -35,15 +33,16 @@ public:
     void modifyWeightAtRow(int row, double weight);
     void insertRowAt(int row, QDate date, double weight);
     void updateTrends(double tau, double gamma);
+    void clearData();
 
-public slots:
-    void clear();
+    class WtModelAttorney;
 
 signals:
     void dataModified();
 
 private:
     void refreshTrendsStartingAtRow(int row);
+    WeightDataManager& getWdManager();
     WeightDataManager& wdm_;
     WeightDataAnalyzer& wda_;
 };

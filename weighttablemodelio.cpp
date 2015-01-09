@@ -1,5 +1,3 @@
-#include <memory>
-
 #include "weighttablemodelio.h"
 #include "weighttablemodel.h"
 #include "weightdatareader.h"
@@ -7,23 +5,24 @@
 
 namespace weighttracker {
 
-bool WeightTableModelIO::populateModelFromFile(WeightTableModel *model, const QString &fileName)
+bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QString &fileName)
 {
-    std::unique_ptr<WeightDataReader> reader(new XMLReader(fileName));
-    model->beginResetModel();
-    bool result = reader->read(model->wdm_);
-    model->refreshTrendsStartingAtRow(0);
-    model->endResetModel();
+    typedef WeightTableModel::WtModelAttorney Attorney;
+    XMLReader reader(fileName);
+    Attorney::beginResetModel(model);
+    Attorney::beginResetModel(model);
+    bool result = reader.read(Attorney::getWdManager(model));
+    Attorney::refreshTrendsStartingAtRow(model, 0);
+    Attorney::endResetModel(model);
 
     return result;
 }
 
 
-bool WeightTableModelIO::writeModelToFile(WeightTableModel *model, const QString &fileName)
+bool WeightTableModelIO::writeModelToFile(WeightTableModel& model, const QString &fileName)
 {
-    std::unique_ptr<WeightDataWriter> writer(new XMLWriter(fileName));
-
-    return writer->write(model->wdm_);
+    XMLReader writer(fileName);
+    return writer.write(Attorney::getWdManager(model));
 }
 
 }

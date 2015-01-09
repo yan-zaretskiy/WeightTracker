@@ -25,6 +25,7 @@ public:
 
     bool readFile(const QString& fileName);
     bool writeFile(const QString& fileName);
+    void clearModel();
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
