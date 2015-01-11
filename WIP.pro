@@ -17,7 +17,9 @@ SOURCES += \
     weightdatawriter.cpp \
     mainwindow.cpp \
     weighttablemodelio.cpp \
-    undocommands.cpp
+    undocommands.cpp \
+    qcustomplot.cpp \
+    weightdataprovider.cpp
 
 HEADERS += \
     weightdatamanager.h \
@@ -31,7 +33,9 @@ HEADERS += \
     mainwindow.h \
     settings.h \
     weighttablemodelio.h \
-    undocommands.h
+    undocommands.h \
+    qcustomplot.h \
+    weightdataprovider.h
 
 CONFIG += c++11
 

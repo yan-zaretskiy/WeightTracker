@@ -7,36 +7,36 @@
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
-#include "weightdataanalyzer.h"
+#include "weightdataprovider.h"
 #include "weighttablemodel.h"
 #include "weighttablemodelio.h"
 #include "adddatadialog.h"
 #include "undocommands.h"
-
+#include "qcustomplot.h"
 
 namespace weighttracker {
 
 WtWidget::WtWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WtWidget),
-    wdm_(), wda_(), model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
+    model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
 {
     ui->setupUi(this);
-
-    wda_.setTau(ui->tauSpinBox->value());
-    wda_.setGamma(ui->gammaSpinBox->value());
+    WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
+    WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
+    wda.setTau(ui->tauSpinBox->value());
+    wda.setGamma(ui->gammaSpinBox->value());
 
     connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
     undoStack_ = new QUndoStack(this);
-    connect(undoStack_, SIGNAL(cleanChanged(bool)), parent, SLOT(weightTableModified()));
-
-    model_ = new WeightTableModel(wdm_, wda_, undoStack_);
+    connect(undoStack_, SIGNAL(cleanChanged(bool)), QWidget::window(), SLOT(weightTableModified()));
 
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
+    model_ = new WeightTableModel(wdm, wda, undoStack_);
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->weightDataView->horizontalHeader()->setHighlightSections(false);
@@ -136,7 +136,8 @@ void WtWidget::invokeAddDataDialog()
 
 void WtWidget::possiblyAddRow(QDate date, double weight)
 {
-    auto result = wdm_.hasDate(date);
+    WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
+    auto result = wdm.hasDate(date);
     int position = result.second;
     if(result.first)
     {
@@ -144,7 +145,7 @@ void WtWidget::possiblyAddRow(QDate date, double weight)
                         tr("The record for %1 already exists.\n"
                            "Do you want to overwrite an old value\n"
                            "of %2 with a new value of %3?").arg(date.toString("MM/dd/yyyy"))
-                                                           .arg(wdm_.at(position).value)
+                                                           .arg(wdm.at(position).value)
                                                            .arg(weight),
                         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
@@ -165,6 +166,18 @@ void WtWidget::possiblyAddRow(QDate date, double weight)
         undoStack_->push(new AddRowCommand(model_, position, date, weight));
         ui->weightDataView->scrollToBottom();
     }
+}
+
+
+void WtWidget::inializePlot()
+{
+    // give the axes some labels:
+    plot_->xAxis->setLabel("x");
+    plot_->yAxis->setLabel("y");
+    // set axes ranges, so we see all data:
+    plot_->xAxis->setRange(-1, 1);
+    plot_->yAxis->setRange(0, 1);
+    plot_->replot();
 }
 
 

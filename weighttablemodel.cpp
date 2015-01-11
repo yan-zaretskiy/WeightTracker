@@ -2,8 +2,7 @@
 #include <QUndoStack>
 
 #include "weighttablemodel.h"
-#include "weightdatamanager.h"
-#include "weightdataanalyzer.h"
+#include "weightdataprovider.h"
 #include "undocommands.h"
 
 namespace weighttracker {
@@ -113,7 +112,6 @@ void WeightTableModel::modifyWeightAtRow(int row, double weight)
 
     emit dataChanged(index(row, 1), index(row, 1));
     emit dataChanged(index(row, 2), index(wdm_.dataSize()-1, 2));
-    emit dataModified();
 }
 
 
@@ -123,7 +121,6 @@ void WeightTableModel::insertRowAt(int row, QDate date, double weight)
     wdm_.addDataPoint(date, weight);
     refreshTrendsStartingAtRow(row);
     endInsertRows();
-    emit dataModified();
 }
 
 
@@ -167,12 +164,6 @@ void WeightTableModel::refreshTrendsStartingAtRow(int row)
 }
 
 
-WeightDataManager &WeightTableModel::getWdManager()
-{
-     return wdm_;
-}
-
-
 bool WeightTableModel::removeRows(int first, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
@@ -181,7 +172,6 @@ bool WeightTableModel::removeRows(int first, int count, const QModelIndex &paren
     wdm_.removeDataPoints(first, count);
     refreshTrendsStartingAtRow(first);
     endRemoveRows();
-    emit dataModified();
 
     return true;
 }

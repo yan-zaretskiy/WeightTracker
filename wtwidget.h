@@ -2,15 +2,14 @@
 #define WTWIDGET_H
 
 #include <QWidget>
-#include "weightdatamanager.h"
-#include "weightdataanalyzer.h"
-
+#include <QDate>
 
 namespace Ui {
 class WtWidget;
 }
 
 class QUndoStack;
+class QCustomPlot;
 
 namespace weighttracker {
 
@@ -40,13 +39,14 @@ private slots:
     void possiblyAddRow(QDate date, double weight);
 
 private:
+    void inializePlot();
+
     Ui::WtWidget* ui;
 
-    WeightDataManager wdm_;
-    WeightDataAnalyzer wda_;
     WeightTableModel* model_;
     AddDataDialog* dialog_;
     QUndoStack* undoStack_;
+    QCustomPlot* plot_;
 };
 
 } // namespace weighttracker

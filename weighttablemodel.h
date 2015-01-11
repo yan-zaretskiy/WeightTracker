@@ -11,7 +11,6 @@ namespace weighttracker {
 
 class WeightDataManager;
 class WeightDataAnalyzer;
-
 class WeightTableModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -40,12 +39,8 @@ public:
     const DataVector& getWeightData() const;
     void clearWeightData();
 
-signals:
-    void dataModified();
-
 private:
     void refreshTrendsStartingAtRow(int row);
-    WeightDataManager& getWdManager();
     WeightDataManager& wdm_;
     WeightDataAnalyzer& wda_;
     QUndoStack* undoStack_;

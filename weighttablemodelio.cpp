@@ -8,7 +8,7 @@ namespace weighttracker {
 bool WeightTableModelIO::populateModelFromFile(WeightTableModel& model, const QString &fileName)
 {
     XMLReader reader(fileName);
-    std::vector<DataPoint> data;
+    DataVector data;
     bool result = reader.read(data);
     model.setWeightData(std::move(data));
 

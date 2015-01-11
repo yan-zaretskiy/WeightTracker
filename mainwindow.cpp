@@ -1,5 +1,4 @@
 #include <QtWidgets>
-#include <QUndoView>
 
 #include "mainwindow.h"
 #include "wtwidget.h"
@@ -9,11 +8,9 @@ namespace weighttracker {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     wtwidget_ = new WtWidget(this);
-    //QUndoView* undoView = new QUndoView(wtwidget_->undoStack(), this);
-    //QSplitter* splitter = new QSplitter(Qt::Horizontal, this);
-    //splitter->addWidget(wtwidget_);
-    //splitter->addWidget(undoView);
-    setCentralWidget(/*splitter*/wtwidget_);
+    QSplitter* mainSplitter = new QSplitter(Qt::Horizontal);
+    mainSplitter->addWidget(wtwidget_);
+    setCentralWidget(mainSplitter);
     createActions();
     createMenus();
 
