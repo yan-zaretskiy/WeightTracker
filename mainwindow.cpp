@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QUndoView>
 
 #include "mainwindow.h"
 #include "wtwidget.h"
@@ -7,6 +8,12 @@ namespace weighttracker {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+    wtwidget_ = new WtWidget(this);
+    //QUndoView* undoView = new QUndoView(wtwidget_->undoStack(), this);
+    //QSplitter* splitter = new QSplitter(Qt::Horizontal, this);
+    //splitter->addWidget(wtwidget_);
+    //splitter->addWidget(undoView);
+    setCentralWidget(/*splitter*/wtwidget_);
     createActions();
     createMenus();
 
@@ -14,8 +21,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     readSettings();
     setCurrentFile("");
-    wtwidget_ = new WtWidget(this);
-    setCentralWidget(wtwidget_);
 }
 
 
@@ -94,7 +99,9 @@ void MainWindow::clearRecentFiles()
 
 void MainWindow::weightTableModified()
 {
-    setWindowModified(true);
+    bool isClean = wtwidget_->undoStack()->isClean();
+    setWindowModified(!isClean);
+    actions_.value("save")->setEnabled(!isClean);
 }
 
 
@@ -114,6 +121,10 @@ void MainWindow::createMenus()
     recentFileMenu_->addAction(actions_.value("clearRecent"));
 
     file->addAction(actions_.value("exit"));
+
+    QMenu *edit = menuBar()->addMenu(tr("&Edit"));
+    edit->addAction(actions_.value("undo"));
+    edit->addAction(actions_.value("redo"));
 }
 
 
@@ -232,6 +243,7 @@ void MainWindow::createActions()
     QAction* saveAction = new QAction(tr("&Save"), this);
     saveAction->setShortcut(QKeySequence::Save);
     saveAction->setStatusTip(tr("Save the weight table to disk"));
+    saveAction->setEnabled(!wtwidget_->undoStack()->isClean());
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     actions_["save"] = saveAction;
 
@@ -250,6 +262,11 @@ void MainWindow::createActions()
     QAction* clearRecentAction = new QAction(tr("&Clear"), this);
     connect(clearRecentAction, SIGNAL(triggered()),this, SLOT(clearRecentFiles()));
     actions_["clearRecent"] = clearRecentAction;
+
+    actions_["undo"] = wtwidget_->undoStack()->createUndoAction(this, tr("&Undo"));
+    actions_["undo"]->setShortcut(QKeySequence::Undo);
+    actions_["redo"] = wtwidget_->undoStack()->createRedoAction(this, tr("&Redo"));
+    actions_["redo"]->setShortcut(QKeySequence::Redo);
 
     QAction* exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcut(tr("Ctrl+Q"));

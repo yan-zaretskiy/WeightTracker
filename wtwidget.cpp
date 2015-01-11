@@ -30,8 +30,9 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
 
     undoStack_ = new QUndoStack(this);
+    connect(undoStack_, SIGNAL(cleanChanged(bool)), parent, SLOT(weightTableModified()));
+
     model_ = new WeightTableModel(wdm_, wda_, undoStack_);
-    connect(model_, SIGNAL(dataModified()), parent, SLOT(weightTableModified())); // this will go away when undo stack is available
 
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
@@ -54,21 +55,27 @@ WtWidget::~WtWidget()
 bool WtWidget::readFile(const QString &fileName)
 {
     bool result = WeightTableModelIO::populateModelFromFile(*model_, fileName);
-    ui->weightDataView->scrollToBottom();
-
+    if (result)
+    {
+        ui->weightDataView->scrollToBottom();
+        undoStack_->clear();
+    }
     return result;
 }
 
 
 bool WtWidget::writeFile(const QString &fileName)
 {
-    return WeightTableModelIO::writeModelToFile(*model_, fileName);
+    bool result = WeightTableModelIO::writeModelToFile(*model_, fileName);
+    if (result) undoStack_->setClean();
+    return result;
 }
 
 
 void WtWidget::clearModel()
 {
     model_->clearWeightData();
+    undoStack_->setClean();
 }
 
 
@@ -109,17 +116,7 @@ void WtWidget::removeSelectedRows()
     if (rows.isEmpty()) return;
 
     int first = rows.first().row();
-    int count = rows.size();
-
-    int r = QMessageBox::question(this, tr("Weight Tracker"),
-                    tr("Are you sure you want to remove %1 %2?").arg(count)
-                                                                .arg(count > 1 ? "rows" : "row"),
-                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-
-    if (r == QMessageBox::Yes)
-        undoStack_->push(new RemoveRowCommand(model_, first));
-    else
-        ui->weightDataView->setFocus();
+    undoStack_->push(new RemoveRowCommand(model_, first));
 }
 
 
