@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QLocale>
 
+#include "weightdataprovider.h"
+
 namespace weighttracker {
 
 AddDataDialog::AddDataDialog(QWidget *parent) :
@@ -25,6 +27,12 @@ AddDataDialog::AddDataDialog(QWidget *parent) :
     ui->dateEdit->calendarWidget()->setGridVisible(true);
 
     ui->weightEdit->setValidator(new QDoubleValidator(0.0, 1000.0, 1));
+
+    connect(ui->dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(updateButtons()));
+    connect(ui->weightEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButtons()));
+
+    auto result = WeightDataProvider::getInstance().wdManager().hasDate(ui->dateEdit->date());
+    ui->warningLabel->setVisible(result.first);
 }
 
 
@@ -55,12 +63,22 @@ void AddDataDialog::accept()
 }
 
 
-void AddDataDialog::on_weightEdit_textChanged()
+void AddDataDialog::updateButtons()
+{
+    bool isInputOK = checkInput();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isInputOK);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setDefault(isInputOK);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(!isInputOK);
+}
+
+
+bool AddDataDialog::checkInput()
 {
     bool isWeightOK = ui->weightEdit->hasAcceptableInput();
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isWeightOK);
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setDefault(isWeightOK);
-    ui->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(!isWeightOK);
+    auto result = WeightDataProvider::getInstance().wdManager().hasDate(ui->dateEdit->date());
+    ui->warningLabel->setVisible(result.first);
+
+    return !result.first && isWeightOK;
 }
 
 

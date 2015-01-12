@@ -2,14 +2,20 @@
 
 #include "mainwindow.h"
 #include "wtwidget.h"
+#include "qcustomplot.h"
 
 namespace weighttracker {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    wtwidget_ = new WtWidget(this);
-    QSplitter* mainSplitter = new QSplitter(Qt::Horizontal);
+    QCustomPlot* plot = new QCustomPlot(this);
+    plot->setMinimumSize(450, 350);
+    wtwidget_ = new WtWidget(plot, this);
+    QSplitter* mainSplitter = new QSplitter(Qt::Horizontal, this);
     mainSplitter->addWidget(wtwidget_);
+    mainSplitter->addWidget(plot);
+    mainSplitter->setStretchFactor(1,1);
+    mainSplitter->setChildrenCollapsible(false);
     setCentralWidget(mainSplitter);
     createActions();
     createMenus();

@@ -21,7 +21,7 @@ class WtWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit WtWidget(QWidget *parent = 0);
+    explicit WtWidget(QCustomPlot* plot, QWidget *parent = 0);
     ~WtWidget();
 
     bool readFile(const QString& fileName);
@@ -36,10 +36,11 @@ private slots:
     void requestTrendsUpdate();
     void removeSelectedRows();
     void invokeAddDataDialog();
-    void possiblyAddRow(QDate date, double weight);
+    void addRow(QDate date, double weight);
 
 private:
-    void inializePlot();
+    void initializePlot();
+    void updatePlot();
 
     Ui::WtWidget* ui;
 

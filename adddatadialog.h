@@ -28,9 +28,11 @@ signals:
     void requestDataInput(QDate date, double weight);
 
 private slots:
-    void on_weightEdit_textChanged();
+    void updateButtons();
 
 private:
+    bool checkInput();
+
     Ui::AddDataDialog *ui;
 };
 

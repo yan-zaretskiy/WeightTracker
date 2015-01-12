@@ -1,8 +1,6 @@
 TODO: edit seleceted row on key event - look at moneyGuru
-TODO: unselect selected row on click (?)
-TODO: undo/redo functionality
 TODO: add weight units option, kg/lbs
-TODO: disable saving with no data, but it may be postponed until after undo is done because saving will be linked to the state of the undo stack
+TODO: improve editing of the new entry dialog as in moneyGuru
 
 ============ PLOTTING============
 TODO: buttons above a graph for duration of a plot (i.e. length of an X axis)

@@ -16,10 +16,10 @@
 
 namespace weighttracker {
 
-WtWidget::WtWidget(QWidget *parent) :
+WtWidget::WtWidget(QCustomPlot* plot, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WtWidget),
-    model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
+    model_(nullptr), dialog_(nullptr), undoStack_(nullptr), plot_(plot)
 {
     ui->setupUi(this);
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
@@ -59,6 +59,8 @@ bool WtWidget::readFile(const QString &fileName)
     {
         ui->weightDataView->scrollToBottom();
         undoStack_->clear();
+        if (model_->rowCount(QModelIndex()) > 0)
+            initializePlot();
     }
     return result;
 }
@@ -126,7 +128,7 @@ void WtWidget::invokeAddDataDialog()
     {
         dialog_ = new AddDataDialog(this);
         dialog_->setModal(true);
-        connect(dialog_, &AddDataDialog::requestDataInput, this, &WtWidget::possiblyAddRow);
+        connect(dialog_, &AddDataDialog::requestDataInput, this, &WtWidget::addRow);
     }
     dialog_->clearInput();
     dialog_->setFocusOnDateEdit();
@@ -134,49 +136,36 @@ void WtWidget::invokeAddDataDialog()
 }
 
 
-void WtWidget::possiblyAddRow(QDate date, double weight)
+void WtWidget::addRow(QDate date, double weight)
 {
-    WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
-    auto result = wdm.hasDate(date);
+    auto result = WeightDataProvider::getInstance().wdManager().hasDate(date);
     int position = result.second;
-    if(result.first)
-    {
-        int r = QMessageBox::warning(this, tr("Weight Tracker"),
-                        tr("The record for %1 already exists.\n"
-                           "Do you want to overwrite an old value\n"
-                           "of %2 with a new value of %3?").arg(date.toString("MM/dd/yyyy"))
-                                                           .arg(wdm.at(position).value)
-                                                           .arg(weight),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
-        if (r == QMessageBox::No)
-        {
-            AddDataDialog* dialog = qobject_cast<AddDataDialog*>(sender());
-            if (dialog)
-            {
-                dialog->show();
-                dialog->setFocusOnDateEdit();
-            }
-            return;
-        }
-        undoStack_->push(new ModifyRowCommand(model_, position, weight));
-    }
-    else
-    {
-        undoStack_->push(new AddRowCommand(model_, position, date, weight));
-        ui->weightDataView->scrollToBottom();
-    }
+    undoStack_->push(new AddRowCommand(model_, position, date, weight));
+    ui->weightDataView->scrollToBottom();
+}
+
+void WtWidget::initializePlot()
+{
+    plot_->xAxis->setLabel("Date");
+    plot_->yAxis->setLabel("Trend weigth");
+    plot_->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    plot_->xAxis->setDateTimeFormat(QLocale().dateFormat(QLocale::ShortFormat));
+
+    QDate firstDate = WeightDataProvider::getInstance().wdManager().getData().front().date;
+    QDate lastDate = WeightDataProvider::getInstance().wdManager().getData().back().date;
+    double firstDateSec = QDateTime(firstDate).toTime_t();
+    double lastDateSec = QDateTime(lastDate).toTime_t();
+    plot_->xAxis->setRange(firstDateSec, lastDateSec);
+    plot_->yAxis->setRange(0, 100);
+
+    plot_->replot();
 }
 
 
-void WtWidget::inializePlot()
+void WtWidget::updatePlot()
 {
-    // give the axes some labels:
-    plot_->xAxis->setLabel("x");
-    plot_->yAxis->setLabel("y");
-    // set axes ranges, so we see all data:
-    plot_->xAxis->setRange(-1, 1);
-    plot_->yAxis->setRange(0, 1);
+
     plot_->replot();
 }
 
