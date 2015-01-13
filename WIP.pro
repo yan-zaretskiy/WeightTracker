@@ -28,7 +28,6 @@ HEADERS += \
     weightdataanalyzer.h \
     adddatadialog.h \
     mainwindow.h \
-    settings.h \
     weighttablemodelio.h \
     undocommands.h \
     qcustomplot.h \

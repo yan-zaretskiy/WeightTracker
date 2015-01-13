@@ -140,7 +140,11 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacerWidget->setVisible(true);
     QToolBar* zoomToolBar = addToolBar(tr("&Zoom"));
+    zoomToolBar->addWidget(spacerWidget);
     zoomToolBar->addAction(actions_.value("zoomOut"));
     zoomToolBar->addAction(actions_.value("zoomIn"));
 }
