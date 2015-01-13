@@ -112,6 +112,7 @@ void WeightTableModel::modifyWeightAtRow(int row, double weight)
 
     emit dataChanged(index(row, 1), index(row, 1));
     emit dataChanged(index(row, 2), index(wdm_.dataSize()-1, 2));
+    emit rowModified(row);
 }
 
 

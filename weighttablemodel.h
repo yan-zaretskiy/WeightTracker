@@ -39,6 +39,9 @@ public:
     const DataVector& getWeightData() const;
     void clearWeightData();
 
+signals:
+    void rowModified(int row);
+
 private:
     void refreshTrendsStartingAtRow(int row);
     WeightDataManager& wdm_;

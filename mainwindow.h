@@ -8,6 +8,7 @@ class QAction;
 namespace weighttracker {
 
 class WtWidget;
+class WeightPlotManager;
 
 class MainWindow : public QMainWindow
 {
@@ -31,6 +32,7 @@ private slots:
 private:
     void createActions();
     void createMenus();
+    void createToolBars();
     void readSettings();
     void writeSettings();
     bool okToContinue();
@@ -42,6 +44,7 @@ private:
     QString strippedName(const QString &fullFileName);
 
     WtWidget* wtwidget_;
+    WeightPlotManager* plotManager_;
     QHash<QString,QAction*> actions_;
     static const int maxRecentFiles = 5;
     QAction *recentFileActions_[maxRecentFiles];

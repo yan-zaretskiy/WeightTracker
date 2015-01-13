@@ -37,7 +37,8 @@ HEADERS += \
     undocommands.h \
     qcustomplot.h \
     weightdataprovider.h \
-    weightplotmanager.h
+    weightplotmanager.h \
+    common.h
 
 CONFIG += c++11
 

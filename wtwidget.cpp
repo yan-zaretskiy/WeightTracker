@@ -12,14 +12,14 @@
 #include "weighttablemodelio.h"
 #include "adddatadialog.h"
 #include "undocommands.h"
-#include "qcustomplot.h"
+#include "common.h"
 
 namespace weighttracker {
 
-WtWidget::WtWidget(QCustomPlot* plot, QWidget *parent) :
+WtWidget::WtWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WtWidget),
-    model_(nullptr), dialog_(nullptr), undoStack_(nullptr), plot_(plot)
+    model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
 {
     ui->setupUi(this);
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
@@ -27,8 +27,8 @@ WtWidget::WtWidget(QCustomPlot* plot, QWidget *parent) :
     wda.setTau(ui->tauSpinBox->value());
     wda.setGamma(ui->gammaSpinBox->value());
 
-    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
-    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(requestTrendsUpdate()));
+    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
+    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
 
     undoStack_ = new QUndoStack(this);
     connect(undoStack_, SIGNAL(cleanChanged(bool)), QWidget::window(), SLOT(weightTableModified()));
@@ -37,6 +37,7 @@ WtWidget::WtWidget(QCustomPlot* plot, QWidget *parent) :
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
     model_ = new WeightTableModel(wdm, wda, undoStack_);
+    connect(model_, SIGNAL(rowModified(int)), this, SLOT(forwardRowModified(int)));
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->weightDataView->horizontalHeader()->setHighlightSections(false);
@@ -59,8 +60,7 @@ bool WtWidget::readFile(const QString &fileName)
     {
         ui->weightDataView->scrollToBottom();
         undoStack_->clear();
-        if (model_->rowCount(QModelIndex()) > 0)
-            initializePlot();
+        emit dataReset();
     }
     return result;
 }
@@ -78,6 +78,7 @@ void WtWidget::clearModel()
 {
     model_->clearWeightData();
     undoStack_->setClean();
+    emit dataReset();
 }
 
 
@@ -106,9 +107,15 @@ bool WtWidget::eventFilter(QObject *object, QEvent *event)
 }
 
 
-void WtWidget::requestTrendsUpdate()
+void WtWidget::updateTrend()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
+    emit trendUpdated(ui->shiftSpinBox->value());
+}
+
+void WtWidget::forwardRowModified(int row)
+{
+    emit weightAltered(row, TableChange::Modify);
 }
 
 
@@ -119,6 +126,7 @@ void WtWidget::removeSelectedRows()
 
     int first = rows.first().row();
     undoStack_->push(new RemoveRowCommand(model_, first));
+    emit weightAltered(first, TableChange::Remove);
 }
 
 
@@ -143,30 +151,7 @@ void WtWidget::addRow(QDate date, double weight)
 
     undoStack_->push(new AddRowCommand(model_, position, date, weight));
     ui->weightDataView->scrollToBottom();
-}
-
-void WtWidget::initializePlot()
-{
-    plot_->xAxis->setLabel("Date");
-    plot_->yAxis->setLabel("Trend weigth");
-    plot_->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    plot_->xAxis->setDateTimeFormat(QLocale().dateFormat(QLocale::ShortFormat));
-
-    QDate firstDate = WeightDataProvider::getInstance().wdManager().getData().front().date;
-    QDate lastDate = WeightDataProvider::getInstance().wdManager().getData().back().date;
-    double firstDateSec = QDateTime(firstDate).toTime_t();
-    double lastDateSec = QDateTime(lastDate).toTime_t();
-    plot_->xAxis->setRange(firstDateSec, lastDateSec);
-    plot_->yAxis->setRange(0, 100);
-
-    plot_->replot();
-}
-
-
-void WtWidget::updatePlot()
-{
-
-    plot_->replot();
+    emit weightAltered(position, TableChange::Add);
 }
 
 
