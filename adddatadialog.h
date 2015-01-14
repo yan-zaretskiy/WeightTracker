@@ -27,6 +27,9 @@ public slots:
 signals:
     void requestDataInput(QDate date, double weight);
 
+protected:
+    bool event(QEvent *event);
+
 private slots:
     void updateButtons();
 

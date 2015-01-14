@@ -4,6 +4,8 @@
 #include <QValidator>
 #include <QPushButton>
 #include <QLocale>
+#include <QKeyEvent>
+#include <QDebug>
 
 #include "weightdataprovider.h"
 
@@ -60,6 +62,20 @@ void AddDataDialog::accept()
     QDialog::accept();
 
     emit requestDataInput(ui->dateEdit->date(), ui->weightEdit->text().toDouble());
+}
+
+bool AddDataDialog::event(QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Tab)
+        {
+            qDebug() << "kaka";//focusNextChild();
+            return true;
+        }
+    }
+    return QDialog::event(event);
 }
 
 
