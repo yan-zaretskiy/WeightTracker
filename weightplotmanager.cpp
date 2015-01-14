@@ -4,84 +4,25 @@
 namespace weighttracker
 {
 
-WeightPlotManager::WeightPlotManager(QCustomPlot *plot, QObject *parent)
-    : QObject(parent), plot_(plot)
+WeightPlotManager::WeightPlotManager(QCustomPlot* plot, WeightDataManager& wdm, WeightDataAnalyzer& wda, QObject *parent)
+    : QObject(parent), plot_(plot), wdm_(wdm), wda_(wda)
 {
     plot_->setLocale(QLocale(QLocale::English, QLocale::UnitedStates));
     plot_->setMinimumSize(450, 350);
 
-    range_ = PlotRange::Month;
-
-    wdm_ = &WeightDataProvider::getInstance().wdManager();
-    wda_ = &WeightDataProvider::getInstance().wdAnalyzer();
+    shift_ = 0;
+//    range_ = PlotRange::Month;
 
     setupAxes();
 }
 
 WeightPlotManager::~WeightPlotManager() { }
 
-
-PlotRange& operator++(PlotRange &pr)
+void WeightPlotManager::setShift(int shift)
 {
-    pr = (pr == PlotRange::Year) ? PlotRange::Year : static_cast<PlotRange>(static_cast<int>(pr) + 1);
-    return pr;
-}
-
-
-PlotRange& operator--(PlotRange &pr)
-{
-    pr = (pr == PlotRange::Week) ? PlotRange::Week : static_cast<PlotRange>(static_cast<int>(pr) - 1);
-    return pr;
-}
-
-
-void WeightPlotManager::zoomIn()
-{
-    --range_;
-    setDateRange();
-    plot_->replot();
-}
-
-void WeightPlotManager::zoomOut()
-{
-    ++range_;
-    setDateRange();
-    plot_->replot();
-}
-
-
-void WeightPlotManager::setDateRange()
-{
-    QDate lastDate = wdm_->getData().empty()
-                    ? QDate::currentDate()
-                    : wdm_->getData().back().date;
-    QDate firstDate;
-
-    // this function should also update number of tick labels
-
-    switch (range_)
-    {
-    case PlotRange::Week:
-        firstDate = lastDate.addDays(-7);
-        break;
-    case PlotRange::Month:
-        firstDate = lastDate.addMonths(-1);
-        break;
-    case PlotRange::ThreeMonths:
-        firstDate = lastDate.addMonths(-3);
-        break;
-    case PlotRange::All:
-        firstDate = wdm_->getData().front().date;
-        break;
-    }
-
-    plot_->xAxis->setRange(QDateTime(firstDate).toTime_t(), QDateTime(lastDate).toTime_t());
-}
-
-
-void WeightPlotManager::setWeightRange()
-{
-    plot_->yAxis->setRange(50, 90);
+    shift_ = shift;
+    if(trendData_ && !trendData_->empty())
+        updateTrends();
 }
 
 
@@ -106,13 +47,108 @@ void WeightPlotManager::setupAxes()
     plot_->xAxis2->setTickLabels(false);
     plot_->yAxis2->setTickLabels(false);
 
-    setRanges();
+    adjustDateRange();
+    adjustWeightRange();
 }
 
 
 void WeightPlotManager::initializePlot()
 {
+    plot_->clearGraphs();
+    weightGraph_ = plot_->addGraph();
+    trendGraph_ = plot_->addGraph();
+    weightData_ = weightGraph_->data();
+    trendData_ = trendGraph_->data();
 
+    QPen thickRedPen;
+    thickRedPen.setColor(Qt::darkRed);
+    thickRedPen.setWidth(4);
+    QPen lightGrayPen;
+    lightGrayPen.setColor(Qt::lightGray);
+    lightGrayPen.setWidth(2);
+
+    trendGraph_->setPen(thickRedPen);
+    weightGraph_->setPen(lightGrayPen);
+
+    for (int i = 0; i < wdm_.dataSize(); ++i)
+    {
+        double date = QDateTime(wdm_.at(i).date).toTime_t();
+        double shiftedDate = QDateTime(wdm_.at(i).date.addDays(shift_)).toTime_t();
+        double weight = wdm_.at(i).value;
+        double trend = wda_.trend().at(i);
+        weightData_->insert(weightData_->constEnd(), date, QCPData(date, weight));
+        trendData_->insert(trendData_->constEnd(), shiftedDate, QCPData(shiftedDate, trend));
+    }
+
+    adjustDateRange();
+    adjustWeightRange();
+
+    plot_->replot();
+}
+
+//PlotRange& operator++(PlotRange &pr)
+//{
+//    pr = (pr == PlotRange::Year) ? PlotRange::Year : static_cast<PlotRange>(static_cast<int>(pr) + 1);
+//    return pr;
+//}
+
+
+//PlotRange& operator--(PlotRange &pr)
+//{
+//    pr = (pr == PlotRange::Week) ? PlotRange::Week : static_cast<PlotRange>(static_cast<int>(pr) - 1);
+//    return pr;
+//}
+
+
+//void WeightPlotManager::zoomIn()
+//{
+//    --range_;
+//    adjustDateRange();
+//    plot_->replot();
+//}
+
+//void WeightPlotManager::zoomOut()
+//{
+//    ++range_;
+//    adjustDateRange();
+//    plot_->replot();
+//}
+
+
+void WeightPlotManager::adjustDateRange()
+{
+    QDate lastDate, firstDate;
+
+    if (wdm_.getData().empty())
+    {
+        lastDate = QDate::currentDate();
+        firstDate = lastDate.addMonths(-1);
+    }
+    else
+    {
+        lastDate = wdm_.getData().back().date;
+        firstDate = wdm_.getData().front().date;
+    }
+
+    double dayInSecs = 86400.0;
+    plot_->xAxis->setRange(QDateTime(firstDate).toTime_t()-dayInSecs, QDateTime(lastDate).toTime_t()+dayInSecs);
+}
+
+
+void WeightPlotManager::adjustWeightRange()
+{
+    if (wdm_.dataSize() == 0)
+        plot_->yAxis->setRange(50, 90);
+    else
+    {
+        double minWeight = wdm_.at(0).value, maxWeight = wdm_.at(0).value;
+        for (auto& w : wdm_.getData())
+        {
+            minWeight = std::min(minWeight, w.value);
+            maxWeight = std::max(maxWeight, w.value);
+        }
+        plot_->yAxis->setRange(std::floor(minWeight), std::ceil(maxWeight));
+    }
 }
 
 
@@ -122,29 +158,32 @@ void WeightPlotManager::alterPoint(int pos, TableChange change)
 }
 
 
-void WeightPlotManager::updateTrends(double shift)
+void WeightPlotManager::updateTrends()
 {
+    trendData_->clear();
 
+    for (int i = 0; i < wdm_.dataSize(); ++i)
+    {
+        double shiftedDate = QDateTime(wdm_.at(i).date.addDays(shift_)).toTime_t();
+        double trend = wda_.trend().at(i);
+        trendData_->insert(trendData_->constEnd(), shiftedDate, QCPData(shiftedDate, trend));
+    }
+
+    adjustWeightRange();
+
+    plot_->replot();
 }
 
 
-void WeightPlotManager::setRange(PlotRange range)
-{
-    range_ = range;
-}
+//void WeightPlotManager::setRange(PlotRange range)
+//{
+//    range_ = range;
+//}
 
 
-PlotRange WeightPlotManager::getRange()
-{
-    return range_;
-}
-
-
-void WeightPlotManager::setRanges()
-{
-    setDateRange();
-    setWeightRange();
-}
-
+//PlotRange WeightPlotManager::getRange()
+//{
+//    return range_;
+//}
 
 }

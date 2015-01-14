@@ -66,6 +66,7 @@ void AddDataDialog::accept()
 
 bool AddDataDialog::event(QEvent* event)
 {
+//    qDebug << static_cast<int>(event->type());
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);

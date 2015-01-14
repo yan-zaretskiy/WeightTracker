@@ -29,6 +29,7 @@ WtWidget::WtWidget(QWidget *parent) :
 
     connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
+    connect(ui->shiftSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(shiftChanged(int)));
 
     undoStack_ = new QUndoStack(this);
     connect(undoStack_, SIGNAL(cleanChanged(bool)), QWidget::window(), SLOT(weightTableModified()));
@@ -110,7 +111,7 @@ bool WtWidget::eventFilter(QObject *object, QEvent *event)
 void WtWidget::updateTrend()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
-    emit trendUpdated(ui->shiftSpinBox->value());
+    emit trendUpdated();
 }
 
 void WtWidget::forwardRowModified(int row)

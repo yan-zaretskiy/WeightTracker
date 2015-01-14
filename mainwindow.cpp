@@ -4,6 +4,7 @@
 #include "wtwidget.h"
 #include "qcustomplot.h"
 #include "weightplotmanager.h"
+#include "weightdataprovider.h"
 #include "common.h"
 
 namespace weighttracker {
@@ -11,10 +12,13 @@ namespace weighttracker {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     QCustomPlot* plot = new QCustomPlot(this);
-    plotManager_ = new WeightPlotManager(plot, this);
+    WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
+    WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
+    plotManager_ = new WeightPlotManager(plot, wdm, wda, this);
     wtwidget_ = new WtWidget(this);
     connect(wtwidget_, SIGNAL(dataReset()), plotManager_, SLOT(initializePlot()));
-    connect(wtwidget_, SIGNAL(trendUpdated(double)), plotManager_, SLOT(updateTrends(double)));
+    connect(wtwidget_, SIGNAL(trendUpdated()), plotManager_, SLOT(updateTrends()));
+    connect(wtwidget_, SIGNAL(shiftChanged(int)), plotManager_, SLOT(setShift(int)));
     connect(wtwidget_, SIGNAL(weightAltered(int, TableChange)), plotManager_, SLOT(alterPoint(int, TableChange)));
 
     QSplitter* mainSplitter = new QSplitter(Qt::Horizontal, this);
@@ -148,9 +152,9 @@ void MainWindow::createToolBars()
     mainToolBar->addSeparator();
     mainToolBar->addAction(actions_.value("undo"));
     mainToolBar->addAction(actions_.value("redo"));
-    mainToolBar->addSeparator();
-    mainToolBar->addAction(actions_.value("zoomOut"));
-    mainToolBar->addAction(actions_.value("zoomIn"));
+//    mainToolBar->addSeparator();
+//    mainToolBar->addAction(actions_.value("zoomOut"));
+//    mainToolBar->addAction(actions_.value("zoomIn"));
 }
 
 
@@ -306,17 +310,17 @@ void MainWindow::createActions()
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     actions_["exit"] = exitAction;
 
-    QAction* zoomOutAction = new QAction(tr("Zoom &Out"), this);
-    zoomOutAction->setStatusTip(tr("Zoom the plot out"));
-    zoomOutAction->setIcon(QIcon(":/images/zoom_out.png"));
-    connect(zoomOutAction, SIGNAL(triggered()), plotManager_, SLOT(zoomOut()));
+//    QAction* zoomOutAction = new QAction(tr("Zoom &Out"), this);
+//    zoomOutAction->setStatusTip(tr("Zoom the plot out"));
+//    zoomOutAction->setIcon(QIcon(":/images/zoom_out.png"));
+//    connect(zoomOutAction, SIGNAL(triggered()), plotManager_, SLOT(zoomOut()));
 
-    actions_["zoomOut"] = zoomOutAction;
-    QAction* zoomInAction = new QAction(tr("Zoom &In"), this);
-    zoomInAction->setStatusTip(tr("Zoom the plot in"));
-    zoomInAction->setIcon(QIcon(":/images/zoom_in.png"));
-    connect(zoomInAction, SIGNAL(triggered()), plotManager_, SLOT(zoomIn()));
-    actions_["zoomIn"] = zoomInAction;
+//    actions_["zoomOut"] = zoomOutAction;
+//    QAction* zoomInAction = new QAction(tr("Zoom &In"), this);
+//    zoomInAction->setStatusTip(tr("Zoom the plot in"));
+//    zoomInAction->setIcon(QIcon(":/images/zoom_in.png"));
+//    connect(zoomInAction, SIGNAL(triggered()), plotManager_, SLOT(zoomIn()));
+//    actions_["zoomIn"] = zoomInAction;
 }
 
 

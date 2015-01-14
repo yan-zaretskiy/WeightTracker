@@ -31,8 +31,9 @@ public:
 
 signals:
     void dataReset();
-    void trendUpdated(double shift);
+    void trendUpdated();
     void weightAltered(int pos, TableChange change);
+    void shiftChanged(int shift);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);

@@ -15,33 +15,36 @@ class WeightPlotManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit WeightPlotManager(QCustomPlot* plot, QObject *parent = 0);
+    explicit WeightPlotManager(QCustomPlot* plot, WeightDataManager& wdm, WeightDataAnalyzer& wda, QObject *parent = 0);
     ~WeightPlotManager();
 
 signals:
 
 public slots:
-    void zoomIn();
-    void zoomOut();
+//    void zoomIn();
+//    void zoomOut();
+    void setShift(int shift);
     void setupAxes();
     void initializePlot();
     void alterPoint(int pos, TableChange change);
-    void updateTrends(double shift);
-    void setRange(PlotRange range);
-    PlotRange getRange();
+    void updateTrends();
+//    void setRange(PlotRange range);
+//    PlotRange getRange();
 
 private:
-    void setRanges();
-    void setDateRange();
-    void setWeightRange();
+    void adjustDateRange();
+    void adjustWeightRange();
 
     QCustomPlot* plot_;
+    QCPGraph* weightGraph_;
+    QCPGraph* trendGraph_;
     QCPDataMap* weightData_;
     QCPDataMap* trendData_;
-    PlotRange range_;
+//    PlotRange range_;
 
-    WeightDataManager* wdm_;
-    WeightDataAnalyzer* wda_;
+    WeightDataManager& wdm_;
+    WeightDataAnalyzer& wda_;
+    int shift_;
 };
 
 }
