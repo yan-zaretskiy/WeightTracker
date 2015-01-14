@@ -140,13 +140,17 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    QWidget *spacerWidget = new QWidget(this);
-    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    spacerWidget->setVisible(true);
-    QToolBar* zoomToolBar = addToolBar(tr("&Zoom"));
-    zoomToolBar->addWidget(spacerWidget);
-    zoomToolBar->addAction(actions_.value("zoomOut"));
-    zoomToolBar->addAction(actions_.value("zoomIn"));
+    QToolBar* mainToolBar = addToolBar(tr("&Main"));
+    mainToolBar->addAction(actions_.value("new"));
+    mainToolBar->addAction(actions_.value("open"));
+    mainToolBar->addAction(actions_.value("save"));
+    mainToolBar->addAction(actions_.value("saveAs"));
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(actions_.value("undo"));
+    mainToolBar->addAction(actions_.value("redo"));
+    mainToolBar->addSeparator();
+    mainToolBar->addAction(actions_.value("zoomOut"));
+    mainToolBar->addAction(actions_.value("zoomIn"));
 }
 
 
@@ -253,12 +257,14 @@ void MainWindow::createActions()
     QAction* newAction = new QAction(tr("&New"), this);
     newAction->setShortcut(QKeySequence::New);
     newAction->setStatusTip(tr("Create a new weight table"));
+    newAction->setIcon(QIcon(":/images/plus.png"));
     connect(newAction, SIGNAL(triggered()), this, SLOT(newFile()));
     actions_["new"] = newAction;
 
     QAction* openAction = new QAction(tr("&Open..."), this);
     openAction->setShortcut(QKeySequence::Open);
     openAction->setStatusTip(tr("Open an existing weight table"));
+    openAction->setIcon(QIcon(":/images/folder.png"));
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
     actions_["open"] = openAction;
 
@@ -266,11 +272,13 @@ void MainWindow::createActions()
     saveAction->setShortcut(QKeySequence::Save);
     saveAction->setStatusTip(tr("Save the weight table to disk"));
     saveAction->setEnabled(!wtwidget_->undoStack()->isClean());
+    saveAction->setIcon(QIcon(":/images/diskette.png"));
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     actions_["save"] = saveAction;
 
     QAction* saveAsAction = new QAction(tr("Save &As..."), this);
     saveAsAction->setStatusTip(tr("Save the weight table under a new name"));
+    saveAsAction->setIcon(QIcon(":/images/save_as.png"));
     connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAs()));
     actions_["saveAs"] = saveAsAction;
 
@@ -287,8 +295,10 @@ void MainWindow::createActions()
 
     actions_["undo"] = wtwidget_->undoStack()->createUndoAction(this, tr("&Undo"));
     actions_["undo"]->setShortcut(QKeySequence::Undo);
+    actions_["undo"]->setIcon(QIcon(":/images/undo.png"));
     actions_["redo"] = wtwidget_->undoStack()->createRedoAction(this, tr("&Redo"));
     actions_["redo"]->setShortcut(QKeySequence::Redo);
+    actions_["redo"]->setIcon(QIcon(":/images/redo.png"));
 
     QAction* exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcut(tr("Ctrl+Q"));

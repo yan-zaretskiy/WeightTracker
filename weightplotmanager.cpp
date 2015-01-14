@@ -23,7 +23,7 @@ WeightPlotManager::~WeightPlotManager() { }
 
 PlotRange& operator++(PlotRange &pr)
 {
-    pr = (pr == PlotRange::All) ? PlotRange::All : static_cast<PlotRange>(static_cast<int>(pr) + 1);
+    pr = (pr == PlotRange::Year) ? PlotRange::Year : static_cast<PlotRange>(static_cast<int>(pr) + 1);
     return pr;
 }
 
@@ -94,10 +94,10 @@ void WeightPlotManager::setupAxes()
     plot_->xAxis->setLabel("Date");
     plot_->yAxis->setLabel("Weight");
     // set a fixed tick-step to one tick per 5 days:
-    plot_->xAxis->setAutoTickStep(false);
-    int fiveDaysInSeconds = 5*86400;
-    plot_->xAxis->setTickStep(fiveDaysInSeconds);
-    plot_->xAxis->setSubTickCount(4);
+//    plot_->xAxis->setAutoTickStep(false);
+//    int fiveDaysInSeconds = 5*86400;
+//    plot_->xAxis->setTickStep(fiveDaysInSeconds);
+//    plot_->xAxis->setSubTickCount(4);
     // make top and right axes visible but without ticks and labels:
     plot_->xAxis2->setVisible(true);
     plot_->yAxis2->setVisible(true);
@@ -106,9 +106,7 @@ void WeightPlotManager::setupAxes()
     plot_->xAxis2->setTickLabels(false);
     plot_->yAxis2->setTickLabels(false);
 
-    // set meaningful default ranges
-    setDateRange();
-    setWeightRange();
+    setRanges();
 }
 
 
@@ -134,5 +132,19 @@ void WeightPlotManager::setRange(PlotRange range)
 {
     range_ = range;
 }
+
+
+PlotRange WeightPlotManager::getRange()
+{
+    return range_;
+}
+
+
+void WeightPlotManager::setRanges()
+{
+    setDateRange();
+    setWeightRange();
+}
+
 
 }

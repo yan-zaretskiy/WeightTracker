@@ -28,8 +28,10 @@ public slots:
     void alterPoint(int pos, TableChange change);
     void updateTrends(double shift);
     void setRange(PlotRange range);
+    PlotRange getRange();
 
 private:
+    void setRanges();
     void setDateRange();
     void setWeightRange();
 
