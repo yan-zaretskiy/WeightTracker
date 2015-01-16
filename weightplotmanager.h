@@ -24,10 +24,9 @@ public slots:
 //    void zoomIn();
 //    void zoomOut();
     void setShift(int shift);
-    void setupAxes();
-    void initializePlot();
-    void alterPoint(int pos, TableChange change);
-    void updateTrends();
+    void setupPlot();
+    void refreshAll();
+    void refreshTrend();
 //    void setRange(PlotRange range);
 //    PlotRange getRange();
 

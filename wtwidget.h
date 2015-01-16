@@ -28,6 +28,8 @@ public:
     bool writeFile(const QString& fileName);
     void clearModel();
     QUndoStack* undoStack() const;
+    void writeSettings();
+    void readSettings();
 
 signals:
     void dataReset();
@@ -41,6 +43,8 @@ protected:
 private slots:
     void updateTrend();
     void forwardRowModified(int row);
+    void forwardRowRemoved(const QModelIndex& parent,int row);
+    void forwardRowAdded(const QModelIndex &parent, int row);
     void removeSelectedRows();
     void invokeAddDataDialog();
     void addRow(QDate date, double weight);

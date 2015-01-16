@@ -16,10 +16,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
     plotManager_ = new WeightPlotManager(plot, wdm, wda, this);
     wtwidget_ = new WtWidget(this);
-    connect(wtwidget_, SIGNAL(dataReset()), plotManager_, SLOT(initializePlot()));
-    connect(wtwidget_, SIGNAL(trendUpdated()), plotManager_, SLOT(updateTrends()));
+    connect(wtwidget_, SIGNAL(dataReset()), plotManager_, SLOT(refreshAll()));
+    connect(wtwidget_, SIGNAL(trendUpdated()), plotManager_, SLOT(refreshTrend()));
     connect(wtwidget_, SIGNAL(shiftChanged(int)), plotManager_, SLOT(setShift(int)));
-    connect(wtwidget_, SIGNAL(weightAltered(int, TableChange)), plotManager_, SLOT(alterPoint(int, TableChange)));
+    connect(wtwidget_, SIGNAL(weightAltered(int, TableChange)), plotManager_, SLOT(refreshAll()));
 
     QSplitter* mainSplitter = new QSplitter(Qt::Horizontal, this);
     mainSplitter->addWidget(wtwidget_);
@@ -164,6 +164,7 @@ void MainWindow::readSettings()
     //restoreGeometry(settings.value("geometry").toByteArray()); // gotta figure out the right defaults first, needs to be uncommented eventually
     recentFiles_ = settings.value("recentFiles").toStringList();
     updateRecentFileActions();
+    wtwidget_->readSettings();
 }
 
 
@@ -172,6 +173,7 @@ void MainWindow::writeSettings()
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
     //settings.setValue("geometry", saveGeometry());
     settings.setValue("recentFiles", recentFiles_);
+    wtwidget_->writeSettings();
 }
 
 

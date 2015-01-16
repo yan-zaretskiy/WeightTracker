@@ -4,6 +4,7 @@
 #include <QDoubleSpinBox>
 #include <QKeyEvent>
 #include <QUndoStack>
+#include <QSettings>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
@@ -39,6 +40,9 @@ WtWidget::WtWidget(QWidget *parent) :
 
     model_ = new WeightTableModel(wdm, wda, undoStack_);
     connect(model_, SIGNAL(rowModified(int)), this, SLOT(forwardRowModified(int)));
+    connect(model_, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(forwardRowRemoved(QModelIndex,int)));
+    connect(model_, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(forwardRowAdded(QModelIndex,int)));
+
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->weightDataView->horizontalHeader()->setHighlightSections(false);
@@ -114,9 +118,24 @@ void WtWidget::updateTrend()
     emit trendUpdated();
 }
 
+
 void WtWidget::forwardRowModified(int row)
 {
     emit weightAltered(row, TableChange::Modify);
+}
+
+
+void WtWidget::forwardRowRemoved(const QModelIndex &parent, int row)
+{
+    Q_UNUSED(parent)
+    emit weightAltered(row, TableChange::Remove);
+}
+
+
+void WtWidget::forwardRowAdded(const QModelIndex &parent, int row)
+{
+    Q_UNUSED(parent)
+    emit weightAltered(row, TableChange::Add);
 }
 
 
@@ -127,7 +146,6 @@ void WtWidget::removeSelectedRows()
 
     int first = rows.first().row();
     undoStack_->push(new RemoveRowCommand(model_, first));
-    emit weightAltered(first, TableChange::Remove);
 }
 
 
@@ -152,7 +170,24 @@ void WtWidget::addRow(QDate date, double weight)
 
     undoStack_->push(new AddRowCommand(model_, position, date, weight));
     ui->weightDataView->scrollToBottom();
-    emit weightAltered(position, TableChange::Add);
+}
+
+
+void WtWidget::readSettings()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
+    ui->tauSpinBox->setValue(settings.value("tau", 9.5).toDouble());
+    ui->gammaSpinBox->setValue(settings.value("gamma", 0.0).toDouble());
+    ui->shiftSpinBox->setValue(settings.value("shift", 0).toInt());
+}
+
+
+void WtWidget::writeSettings()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
+    settings.setValue("tau", ui->tauSpinBox->value());
+    settings.setValue("gamma", ui->gammaSpinBox->value());
+    settings.setValue("shift", ui->shiftSpinBox->value());
 }
 
 
