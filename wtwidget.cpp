@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QUndoStack>
 #include <QSettings>
+#include <QTimer>
 
 #include "wtwidget.h"
 #include "ui_wtwidget.h"
@@ -42,6 +43,8 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(model_, SIGNAL(rowModified(int)), this, SLOT(forwardRowModified(int)));
     connect(model_, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(forwardRowRemoved(QModelIndex,int)));
     connect(model_, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(forwardRowAdded(QModelIndex,int)));
+
+    connect(model_, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(autoScroll()));
 
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -112,6 +115,12 @@ bool WtWidget::eventFilter(QObject *object, QEvent *event)
 }
 
 
+void WtWidget::autoScroll()
+{
+    QTimer::singleShot(0, ui->weightDataView, SLOT(scrollToBottom()));
+}
+
+
 void WtWidget::updateTrend()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
@@ -164,7 +173,6 @@ void WtWidget::addRow(QDate date, double weight)
     int position = result.second;
 
     undoStack_->push(new AddRowCommand(model_, position, date, weight));
-    ui->weightDataView->scrollToBottom();
 }
 
 

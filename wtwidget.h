@@ -41,6 +41,7 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
+    void autoScroll();
     void updateTrend();
     void forwardRowModified(int row);
     void forwardRowRemoved(const QModelIndex& parent,int row);
