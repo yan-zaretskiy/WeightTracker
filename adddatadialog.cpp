@@ -57,6 +57,12 @@ void AddDataDialog::setFocusOnDateEdit()
 }
 
 
+void AddDataDialog::setFocusOnWeightEdit()
+{
+    ui->weightEdit->setFocus();
+}
+
+
 void AddDataDialog::accept()
 {
     QDialog::accept();

@@ -20,7 +20,7 @@ namespace weighttracker {
 WtWidget::WtWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WtWidget),
-    model_(nullptr), dialog_(nullptr), undoStack_(nullptr)
+    model_(nullptr), undoStack_(nullptr)
 {
     ui->setupUi(this);
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
@@ -151,15 +151,10 @@ void WtWidget::removeSelectedRows()
 
 void WtWidget::invokeAddDataDialog()
 {
-    if(!dialog_)
-    {
-        dialog_ = new AddDataDialog(this);
-        dialog_->setModal(true);
-        connect(dialog_, &AddDataDialog::requestDataInput, this, &WtWidget::addRow);
-    }
-    dialog_->clearInput();
-    dialog_->setFocusOnDateEdit();
-    dialog_->show();
+    AddDataDialog dialog(this);
+    connect(&dialog, &AddDataDialog::requestDataInput, this, &WtWidget::addRow);
+    dialog.setFocusOnWeightEdit();
+    dialog.exec();
 }
 
 

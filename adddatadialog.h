@@ -20,6 +20,7 @@ public:
 
     void clearInput();
     void setFocusOnDateEdit();
+    void setFocusOnWeightEdit();
 
 public slots:
     void accept();

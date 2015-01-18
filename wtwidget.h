@@ -53,7 +53,6 @@ private:
     Ui::WtWidget* ui;
 
     WeightTableModel* model_;
-    AddDataDialog* dialog_;
     QUndoStack* undoStack_;
 };
 
