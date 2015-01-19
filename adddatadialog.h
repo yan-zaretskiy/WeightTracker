@@ -29,13 +29,15 @@ signals:
     void requestDataInput(QDate date, double weight);
 
 protected:
-    bool event(QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
     void updateButtons();
 
 private:
     bool checkInput();
+    void selectPreviousSection();
+    void selectNextSection();
 
     Ui::AddDataDialog *ui;
 };

@@ -27,7 +27,7 @@ public:
     bool readFile(const QString& fileName);
     bool writeFile(const QString& fileName);
     void clearModel();
-    QUndoStack* undoStack() const;
+    QUndoStack* undoStack() const {return undoStack_;}
     void writeSettings();
     void readSettings();
 
@@ -47,8 +47,10 @@ private slots:
     void addRow(QDate date, double weight);
 
 private:
-    Ui::WtWidget* ui;
+    void setupTableView();
+    void establishConnections();
 
+    Ui::WtWidget* ui;
     WeightTableModel* model_;
     QUndoStack* undoStack_;
 };

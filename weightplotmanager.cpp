@@ -18,6 +18,7 @@ WeightPlotManager::WeightPlotManager(QCustomPlot* plot, WeightDataManager& wdm, 
 
 WeightPlotManager::~WeightPlotManager() { }
 
+
 void WeightPlotManager::setShift(int shift)
 {
     shift_ = shift;

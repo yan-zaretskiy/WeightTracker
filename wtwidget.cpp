@@ -26,36 +26,15 @@ WtWidget::WtWidget(QWidget *parent) :
     ui->setupUi(this);
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
     WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
+
     wda.setTau(ui->tauSpinBox->value());
     wda.setGamma(ui->gammaSpinBox->value());
 
-    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
-    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
-    connect(ui->shiftSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(shiftChanged(int)));
-
     undoStack_ = new QUndoStack(this);
-    connect(undoStack_, SIGNAL(cleanChanged(bool)), QWidget::window(), SLOT(weightTableModified()));
-
-    connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
-    connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
-
     model_ = new WeightTableModel(wdm, wda, undoStack_);
 
-    connect(model_, &WeightTableModel::rowModified, this,
-            [this](int row){ emit weightAltered(row, TableChange::Modify); });
-    connect(model_, &WeightTableModel::rowsRemoved, this,
-            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Remove); });
-    connect(model_, &WeightTableModel::rowsInserted, this,
-            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Add); });
-    connect(model_, &WeightTableModel::rowsInserted,
-            [this](){ QTimer::singleShot(0, ui->weightDataView, &QTableView::scrollToBottom); });
-
-    ui->weightDataView->setModel(model_);
-    ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->weightDataView->horizontalHeader()->setHighlightSections(false);
-    ui->weightDataView->resizeColumnsToContents();
-    ui->weightDataView->verticalHeader()->setVisible(false);
-    ui->weightDataView->installEventFilter(this);
+    establishConnections();
+    setupTableView();
 }
 
 
@@ -91,12 +70,6 @@ void WtWidget::clearModel()
     model_->clearWeightData();
     undoStack_->setClean();
     emit dataReset();
-}
-
-
-QUndoStack* WtWidget::undoStack() const
-{
-    return undoStack_;
 }
 
 
@@ -151,6 +124,38 @@ void WtWidget::addRow(QDate date, double weight)
     int position = result.second;
 
     undoStack_->push(new AddRowCommand(model_, position, date, weight));
+}
+
+
+void WtWidget::establishConnections()
+{
+    connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
+    connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
+    connect(ui->shiftSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(shiftChanged(int)));
+    connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
+    connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
+
+    connect(undoStack_, SIGNAL(cleanChanged(bool)), QWidget::window(), SLOT(weightTableModified()));
+
+    connect(model_, &WeightTableModel::rowModified, this,
+            [this](int row){ emit weightAltered(row, TableChange::Modify); });
+    connect(model_, &WeightTableModel::rowsRemoved, this,
+            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Remove); });
+    connect(model_, &WeightTableModel::rowsInserted, this,
+            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Add); });
+    connect(model_, &WeightTableModel::rowsInserted,
+            [this](){ QTimer::singleShot(0, ui->weightDataView, &QTableView::scrollToBottom); });
+}
+
+
+void WtWidget::setupTableView()
+{
+    ui->weightDataView->setModel(model_);
+    ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->weightDataView->horizontalHeader()->setHighlightSections(false);
+    ui->weightDataView->resizeColumnsToContents();
+    ui->weightDataView->verticalHeader()->setVisible(false);
+    ui->weightDataView->installEventFilter(this);
 }
 
 

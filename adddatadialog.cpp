@@ -27,6 +27,7 @@ AddDataDialog::AddDataDialog(QWidget *parent) :
     ui->dateEdit->setFocus();
     ui->dateEdit->calendarWidget()->setFirstDayOfWeek(Qt::Monday);
     ui->dateEdit->calendarWidget()->setGridVisible(true);
+    ui->dateEdit->installEventFilter(this);
 
     ui->weightEdit->setValidator(new QDoubleValidator(0.0, 1000.0, 1));
 
@@ -70,19 +71,43 @@ void AddDataDialog::accept()
     emit requestDataInput(ui->dateEdit->date(), ui->weightEdit->text().toDouble());
 }
 
-bool AddDataDialog::event(QEvent* event)
+
+bool AddDataDialog::eventFilter(QObject *object, QEvent *event)
 {
-//    qDebug << static_cast<int>(event->type());
-    if (event->type() == QEvent::KeyPress)
+    if(object == ui->dateEdit)
     {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Tab)
+        switch (event->type())
         {
-            qDebug() << "kaka";//focusNextChild();
-            return true;
+        case QEvent::KeyPress:
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            switch (keyEvent->key())
+            {
+            case Qt::Key_Tab:
+                focusNextChild(); break;
+            case Qt::Key_Backtab:
+                focusPreviousChild(); break;
+            case Qt::Key_Left:
+                selectPreviousSection(); break;
+            case Qt::Key_Right:
+                selectNextSection(); break;
+            default:
+                return false;
+            }
         }
+        case QEvent::FocusIn:
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab)
+                ui->dateEdit->setSelectedSection(QDateEdit::DaySection);
+            break;
+        }
+        default:
+            return false;
+        }
+        return true;
     }
-    return QDialog::event(event);
+    return QWidget::eventFilter(object, event);
 }
 
 
@@ -102,6 +127,20 @@ bool AddDataDialog::checkInput()
     ui->warningLabel->setVisible(result.first);
 
     return !result.first && isWeightOK;
+}
+
+
+void AddDataDialog::selectPreviousSection()
+{
+    int currentSection = ui->dateEdit->currentSectionIndex();
+    int nextSection = (currentSection == 0 ? ui->dateEdit->sectionCount() : currentSection) - 1;
+    ui->dateEdit->setCurrentSection(ui->dateEdit->sectionAt(nextSection));
+}
+
+
+void AddDataDialog::selectNextSection()
+{
+
 }
 
 
