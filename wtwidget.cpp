@@ -40,11 +40,15 @@ WtWidget::WtWidget(QWidget *parent) :
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 
     model_ = new WeightTableModel(wdm, wda, undoStack_);
-    connect(model_, SIGNAL(rowModified(int)), this, SLOT(forwardRowModified(int)));
-    connect(model_, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(forwardRowRemoved(QModelIndex,int)));
-    connect(model_, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(forwardRowAdded(QModelIndex,int)));
 
-    connect(model_, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(autoScroll()));
+    connect(model_, &WeightTableModel::rowModified, this,
+            [this](int row){ emit weightAltered(row, TableChange::Modify); });
+    connect(model_, &WeightTableModel::rowsRemoved, this,
+            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Remove); });
+    connect(model_, &WeightTableModel::rowsInserted, this,
+            [this](const QModelIndex&, int first, int){ emit weightAltered(first, TableChange::Add); });
+    connect(model_, &WeightTableModel::rowsInserted,
+            [this](){ QTimer::singleShot(0, ui->weightDataView, &QTableView::scrollToBottom); });
 
     ui->weightDataView->setModel(model_);
     ui->weightDataView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -115,36 +119,10 @@ bool WtWidget::eventFilter(QObject *object, QEvent *event)
 }
 
 
-void WtWidget::autoScroll()
-{
-    QTimer::singleShot(0, ui->weightDataView, SLOT(scrollToBottom()));
-}
-
-
 void WtWidget::updateTrend()
 {
     model_->updateTrends(ui->tauSpinBox->value(), ui->gammaSpinBox->value());
     emit trendUpdated();
-}
-
-
-void WtWidget::forwardRowModified(int row)
-{
-    emit weightAltered(row, TableChange::Modify);
-}
-
-
-void WtWidget::forwardRowRemoved(const QModelIndex &parent, int row)
-{
-    Q_UNUSED(parent)
-    emit weightAltered(row, TableChange::Remove);
-}
-
-
-void WtWidget::forwardRowAdded(const QModelIndex &parent, int row)
-{
-    Q_UNUSED(parent)
-    emit weightAltered(row, TableChange::Add);
 }
 
 

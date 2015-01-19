@@ -41,11 +41,7 @@ protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private slots:
-    void autoScroll();
     void updateTrend();
-    void forwardRowModified(int row);
-    void forwardRowRemoved(const QModelIndex& parent,int row);
-    void forwardRowAdded(const QModelIndex &parent, int row);
     void removeSelectedRows();
     void invokeAddDataDialog();
     void addRow(QDate date, double weight);
