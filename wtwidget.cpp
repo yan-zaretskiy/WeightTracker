@@ -24,6 +24,7 @@ WtWidget::WtWidget(QWidget *parent) :
     model_(nullptr), undoStack_(nullptr)
 {
     ui->setupUi(this);
+    readSettings();
     WeightDataAnalyzer& wda = WeightDataProvider::getInstance().wdAnalyzer();
     WeightDataManager& wdm = WeightDataProvider::getInstance().wdManager();
 
@@ -132,6 +133,7 @@ void WtWidget::establishConnections()
     connect(ui->tauSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
     connect(ui->gammaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateTrend()));
     connect(ui->shiftSpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(shiftChanged(int)));
+
     connect(ui->removeRowButton, &QPushButton::clicked, this, &WtWidget::removeSelectedRows);
     connect(ui->addRowButton, &QPushButton::clicked, this, &WtWidget::invokeAddDataDialog);
 

@@ -22,6 +22,8 @@ public:
     double gamma() const;
     void setGamma(double gamma);
 
+    std::pair<double, double> fitData(const DataVector& data);
+
 private:
     std::vector<double> trend_;
     double tau_;

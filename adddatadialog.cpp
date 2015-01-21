@@ -12,7 +12,7 @@
 namespace weighttracker {
 
 AddDataDialog::AddDataDialog(QWidget *parent) :
-    QDialog(parent),
+    QDialog(parent), lastDateEditSection_(QDateEdit::DaySection),
     ui(new Ui::AddDataDialog)
 {
     ui->setupUi(this);
@@ -76,34 +76,38 @@ bool AddDataDialog::eventFilter(QObject *object, QEvent *event)
 {
     if(object == ui->dateEdit)
     {
+        QKeyEvent *keyEvent;
         switch (event->type())
         {
         case QEvent::KeyPress:
-        {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            keyEvent = static_cast<QKeyEvent *>(event);
             switch (keyEvent->key())
             {
             case Qt::Key_Tab:
-                focusNextChild(); break;
+                focusNextChild();
+                break;
             case Qt::Key_Backtab:
-                focusPreviousChild(); break;
+                focusPreviousChild();
+                break;
             case Qt::Key_Left:
-                selectPreviousSection(); break;
+                selectPreviousSection();
+                break;
             case Qt::Key_Right:
-                selectNextSection(); break;
+                selectNextSection();
+                break;
             default:
-                return false;
+                return QWidget::eventFilter(object, event);
             }
-        }
-        case QEvent::FocusIn:
-        {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab)
-                ui->dateEdit->setSelectedSection(QDateEdit::DaySection);
             break;
-        }
+        case QEvent::FocusIn:
+            ui->dateEdit->setSelectedSection(lastDateEditSection_);
+            break;
+        case QEvent::FocusOut:
+            lastDateEditSection_ = ui->dateEdit->currentSection();
+            ui->dateEdit->setSelectedSection(QDateEdit::NoSection);
+            break;
         default:
-            return false;
+            return QWidget::eventFilter(object, event);
         }
         return true;
     }
@@ -133,14 +137,16 @@ bool AddDataDialog::checkInput()
 void AddDataDialog::selectPreviousSection()
 {
     int currentSection = ui->dateEdit->currentSectionIndex();
-    int nextSection = (currentSection == 0 ? ui->dateEdit->sectionCount() : currentSection) - 1;
-    ui->dateEdit->setCurrentSection(ui->dateEdit->sectionAt(nextSection));
+    int nextSection = (currentSection == 0 ? ui->dateEdit->sectionCount()-1 : currentSection-1);
+    ui->dateEdit->setSelectedSection(ui->dateEdit->sectionAt(nextSection));
 }
 
 
 void AddDataDialog::selectNextSection()
 {
-
+    int currentSection = ui->dateEdit->currentSectionIndex();
+    int nextSection = (currentSection == ui->dateEdit->sectionCount()-1 ? 0 : currentSection+1);
+    ui->dateEdit->setSelectedSection(ui->dateEdit->sectionAt(nextSection));
 }
 
 

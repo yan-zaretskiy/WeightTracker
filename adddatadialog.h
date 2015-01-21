@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QDate>
+#include <QDateTimeEdit>
 
 namespace Ui {
 class AddDataDialog;
@@ -39,6 +40,7 @@ private:
     void selectPreviousSection();
     void selectNextSection();
 
+    QDateTimeEdit::Section lastDateEditSection_;
     Ui::AddDataDialog *ui;
 };
 

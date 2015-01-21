@@ -6,6 +6,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = WeightTracker
 TEMPLATE = app
 
+INCLUDEPATH += "D:/Dev/dlib-18.12/"
+
 SOURCES += \
     main.cpp \
     weightdatamanager.cpp \

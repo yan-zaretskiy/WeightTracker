@@ -164,7 +164,6 @@ void MainWindow::readSettings()
     //restoreGeometry(settings.value("geometry").toByteArray()); // gotta figure out the right defaults first, needs to be uncommented eventually
     recentFiles_ = settings.value("recentFiles").toStringList();
     updateRecentFileActions();
-    wtwidget_->readSettings();
 }
 
 
