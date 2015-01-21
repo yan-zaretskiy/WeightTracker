@@ -152,16 +152,13 @@ void MainWindow::createToolBars()
     mainToolBar->addSeparator();
     mainToolBar->addAction(actions_.value("undo"));
     mainToolBar->addAction(actions_.value("redo"));
-//    mainToolBar->addSeparator();
-//    mainToolBar->addAction(actions_.value("zoomOut"));
-//    mainToolBar->addAction(actions_.value("zoomIn"));
 }
 
 
 void MainWindow::readSettings()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
-    //restoreGeometry(settings.value("geometry").toByteArray()); // gotta figure out the right defaults first, needs to be uncommented eventually
+    restoreGeometry(settings.value("geometry").toByteArray()); // gotta figure out the right defaults first, needs to be uncommented eventually
     recentFiles_ = settings.value("recentFiles").toStringList();
     updateRecentFileActions();
 }
@@ -170,7 +167,7 @@ void MainWindow::readSettings()
 void MainWindow::writeSettings()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
-    //settings.setValue("geometry", saveGeometry());
+    settings.setValue("geometry", saveGeometry());
     settings.setValue("recentFiles", recentFiles_);
     wtwidget_->writeSettings();
 }
@@ -310,18 +307,6 @@ void MainWindow::createActions()
     exitAction->setStatusTip(tr("Exit the application"));
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     actions_["exit"] = exitAction;
-
-//    QAction* zoomOutAction = new QAction(tr("Zoom &Out"), this);
-//    zoomOutAction->setStatusTip(tr("Zoom the plot out"));
-//    zoomOutAction->setIcon(QIcon(":/images/zoom_out.png"));
-//    connect(zoomOutAction, SIGNAL(triggered()), plotManager_, SLOT(zoomOut()));
-
-//    actions_["zoomOut"] = zoomOutAction;
-//    QAction* zoomInAction = new QAction(tr("Zoom &In"), this);
-//    zoomInAction->setStatusTip(tr("Zoom the plot in"));
-//    zoomInAction->setIcon(QIcon(":/images/zoom_in.png"));
-//    connect(zoomInAction, SIGNAL(triggered()), plotManager_, SLOT(zoomIn()));
-//    actions_["zoomIn"] = zoomInAction;
 }
 
 
