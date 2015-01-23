@@ -29,6 +29,13 @@ void WeightPlotManager::setShift(int shift)
 
 void WeightPlotManager::setupPlot()
 {
+    // add title layout element:
+    // first we create and prepare a plot title layout element:
+    QCPPlotTitle *title = new QCPPlotTitle(plot_);
+    title->setText("Weight Evolution");
+    title->setFont(QFont("sans", 12, QFont::Bold));
+    plot_->plotLayout()->insertRow(0);
+    plot_->plotLayout()->addElement(0, 0, title);
     // configure bottom axis to show date and time instead of number:
     plot_->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     plot_->xAxis->setDateTimeFormat("MMM dd");
@@ -44,7 +51,9 @@ void WeightPlotManager::setupPlot()
     plot_->yAxis2->setTickLabels(false);
 
     weightGraph_ = plot_->addGraph();
+    weightGraph_->setName("Weight");
     trendGraph_ = plot_->addGraph();
+    trendGraph_->setName("Trend");
     weightData_ = weightGraph_->data();
     trendData_ = trendGraph_->data();
 
@@ -52,11 +61,13 @@ void WeightPlotManager::setupPlot()
     thickRedPen.setColor(Qt::darkRed);
     thickRedPen.setWidth(4);
     QPen lightGrayPen;
-    lightGrayPen.setColor(Qt::lightGray);
+    lightGrayPen.setColor(Qt::darkGray);
     lightGrayPen.setWidth(2);
 
     trendGraph_->setPen(thickRedPen);
     weightGraph_->setPen(lightGrayPen);
+    weightGraph_->setLineStyle(QCPGraph::lsNone);
+    weightGraph_->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
 
     adjustDateRange();
     adjustWeightRange();
@@ -76,6 +87,7 @@ void WeightPlotManager::refreshAll()
         weightData_->insert(weightData_->constEnd(), date, QCPData(date, weight));
         trendData_->insert(trendData_->constEnd(), shiftedDate, QCPData(shiftedDate, trend));
     }
+    plot_->legend->setVisible(wdm_.dataSize() > 0);
 
     if (wdm_.dataSize() == 1)
         trendGraph_->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
