@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     createMenus();
     createToolBars();
 
-    setWindowIcon(QIcon(":/images/chart.png"));
+    setWindowIcon(QIcon(":/images/scale.png"));
 
     readSettings();
     setCurrentFile("");
