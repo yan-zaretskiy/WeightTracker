@@ -1,14 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>images/chart.png</file>
-        <file>images/zoom_in.png</file>
-        <file>images/zoom_out.png</file>
         <file>images/diskette.png</file>
         <file>images/folder.png</file>
         <file>images/plus.png</file>
         <file>images/redo.png</file>
         <file>images/undo.png</file>
-        <file>images/zoom_all.png</file>
         <file>images/save_as.png</file>
         <file>images/scale.png</file>
     </qresource>

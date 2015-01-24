@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setWindowIcon(QIcon(":/images/scale.png"));
 
     readSettings();
-    setCurrentFile("");
 }
 
 
@@ -160,6 +159,11 @@ void MainWindow::readSettings()
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "Yan Zaretskiy", "Weight Tracker");
     restoreGeometry(settings.value("geometry").toByteArray()); // gotta figure out the right defaults first, needs to be uncommented eventually
     recentFiles_ = settings.value("recentFiles").toStringList();
+    if (QFile::exists(recentFiles_.first()))
+        loadFile(recentFiles_.first());
+    else
+        setCurrentFile("");
+
     updateRecentFileActions();
 }
 
