@@ -35,6 +35,7 @@ public:
     void clear();
     int dataSize() const;
     std::pair<bool,int> hasDate(const QDate& date) const;
+
     void addDataPoint(QDate date, double weight);
     void modifyValueAt(int i, double newValue);
     void removeDataPoints(int first, int count);

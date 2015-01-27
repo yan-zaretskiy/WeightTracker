@@ -21,14 +21,10 @@ public:
 signals:
 
 public slots:
-//    void zoomIn();
-//    void zoomOut();
     void setShift(int shift);
     void setupPlot();
     void refreshAll();
     void refreshTrend();
-//    void setRange(PlotRange range);
-//    PlotRange getRange();
 
 private:
     void adjustDateRange();
@@ -39,7 +35,6 @@ private:
     QCPGraph* trendGraph_;
     QCPDataMap* weightData_;
     QCPDataMap* trendData_;
-//    PlotRange range_;
 
     WeightDataManager& wdm_;
     WeightDataAnalyzer& wda_;

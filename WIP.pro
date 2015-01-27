@@ -20,7 +20,8 @@ SOURCES += \
     undocommands.cpp \
     qcustomplot.cpp \
     weightdataprovider.cpp \
-    weightplotmanager.cpp
+    weightplotmanager.cpp \
+    ticks.cpp
 
 HEADERS += \
     weightdatamanager.h \
@@ -35,7 +36,8 @@ HEADERS += \
     qcustomplot.h \
     weightdataprovider.h \
     weightplotmanager.h \
-    common.h
+    common.h \
+    ticks.h
 
 CONFIG += c++11
 

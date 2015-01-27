@@ -1,5 +1,6 @@
 #include "weightplotmanager.h"
 #include "weightdataprovider.h"
+#include "ticks.h"
 
 namespace weighttracker
 {
@@ -11,7 +12,6 @@ WeightPlotManager::WeightPlotManager(QCustomPlot* plot, WeightDataManager& wdm, 
     plot_->setMinimumSize(450, 350);
 
     shift_ = 0;
-//    range_ = PlotRange::Month;
 
     setupPlot();
 }
@@ -132,12 +132,6 @@ void WeightPlotManager::adjustDateRange()
 
     double dayInSecs = 86400.0;
     plot_->xAxis->setRange(QDateTime(firstDate).toTime_t()-dayInSecs, QDateTime(lastDate).toTime_t()+dayInSecs);
-    // set a fixed tick-step to one tick per 5 days:
-//    plot_->xAxis->setAutoTickStep(false);
-//    int fiveDaysInSeconds = 5*86400;
-//    plot_->xAxis->setTickStep(fiveDaysInSeconds);
-//    plot_->xAxis->setSubTickCount(4);
-
 }
 
 
@@ -153,48 +147,15 @@ void WeightPlotManager::adjustWeightRange()
             minWeight = std::min(minWeight, w.value);
             maxWeight = std::max(maxWeight, w.value);
         }
-        plot_->yAxis->setRange(std::floor(minWeight), std::ceil(maxWeight));
+
+        auto ticks = ticksCalculations::niceTicks(minWeight, maxWeight, 10);
+
+        plot_->yAxis->setAutoTickStep(false);
+        plot_->yAxis->setTickStep(ticks.tickSpacing);
+        plot_->yAxis->setAutoSubTicks(false);
+        plot_->yAxis->setSubTickCount(0);
+        plot_->yAxis->setRange(ticks.niceMin, ticks.niceMax);
     }
 }
-
-
-//void WeightPlotManager::setRange(PlotRange range)
-//{
-//    range_ = range;
-//}
-
-
-//PlotRange WeightPlotManager::getRange()
-//{
-//    return range_;
-//}
-
-//PlotRange& operator++(PlotRange &pr)
-//{
-//    pr = (pr == PlotRange::Year) ? PlotRange::Year : static_cast<PlotRange>(static_cast<int>(pr) + 1);
-//    return pr;
-//}
-
-
-//PlotRange& operator--(PlotRange &pr)
-//{
-//    pr = (pr == PlotRange::Week) ? PlotRange::Week : static_cast<PlotRange>(static_cast<int>(pr) - 1);
-//    return pr;
-//}
-
-
-//void WeightPlotManager::zoomIn()
-//{
-//    --range_;
-//    adjustDateRange();
-//    plot_->replot();
-//}
-
-//void WeightPlotManager::zoomOut()
-//{
-//    ++range_;
-//    adjustDateRange();
-//    plot_->replot();
-//}
 
 }
