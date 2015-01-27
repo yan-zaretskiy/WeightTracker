@@ -132,13 +132,14 @@ void WeightPlotManager::adjustDateRange()
 
     auto dateTicks = ticksCalculations::niceTicks(firstDate, lastDate, 5);
 
-    double firstDateInSeconds = QDateTime(firstDate).toTime_t();
-    double lastDateInSeconds = QDateTime(lastDate).toTime_t();
-    double dateRange = lastDateInSeconds - firstDateInSeconds;
-    if (dateTicks.dates.front() == firstDate) firstDateInSeconds -= 0.05 * dateRange;
-    if (dateTicks.dates.back() == lastDate) lastDateInSeconds += 0.05 * dateRange;
+    double minRangeInSeconds = QDateTime(dateTicks.dates.front()).toTime_t();
+    double maxRangeInSeconds = QDateTime(dateTicks.dates.back()).toTime_t();
+    double dateRange = maxRangeInSeconds - minRangeInSeconds;
 
-    plot_->xAxis->setRange(firstDateInSeconds, lastDateInSeconds);
+    if (dateTicks.dates.front() == firstDate) minRangeInSeconds -= 0.05 * dateRange;
+    if (dateTicks.dates.back() == lastDate) maxRangeInSeconds += 0.05 * dateRange;
+
+    plot_->xAxis->setRange(minRangeInSeconds, maxRangeInSeconds);
 
     // apply manual tick and tick label for date axis:
     plot_->xAxis->setAutoTicks(false);
