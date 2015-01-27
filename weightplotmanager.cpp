@@ -130,8 +130,31 @@ void WeightPlotManager::adjustDateRange()
         firstDate = wdm_.getData().front().date;
     }
 
-    double dayInSecs = 86400.0;
-    plot_->xAxis->setRange(QDateTime(firstDate).toTime_t()-dayInSecs, QDateTime(lastDate).toTime_t()+dayInSecs);
+    auto dateTicks = ticksCalculations::niceTicks(firstDate, lastDate, 5);
+
+    double firstDateInSeconds = QDateTime(firstDate).toTime_t();
+    double lastDateInSeconds = QDateTime(lastDate).toTime_t();
+    double dateRange = lastDateInSeconds - firstDateInSeconds;
+    if (dateTicks.dates.front() == firstDate) firstDateInSeconds -= 0.05 * dateRange;
+    if (dateTicks.dates.back() == lastDate) lastDateInSeconds += 0.05 * dateRange;
+
+    plot_->xAxis->setRange(firstDateInSeconds, lastDateInSeconds);
+
+    // apply manual tick and tick label for date axis:
+    plot_->xAxis->setAutoTicks(false);
+    plot_->xAxis->setAutoTickLabels(false);
+
+    QVector<double> tickVector;
+    QVector<QString> tickLabels;
+    for (int i = 0; i < dateTicks.dates.size(); ++i)
+    {
+        double dateinSeconds = QDateTime(dateTicks.dates[i]).toTime_t();
+        tickVector.push_back(dateinSeconds);
+        tickLabels.push_back(dateTicks.dates[i].toString(dateTicks.format));
+    }
+    plot_->xAxis->setTickVector(tickVector);
+    plot_->xAxis->setTickVectorLabels(tickLabels);
+
 }
 
 
@@ -148,7 +171,7 @@ void WeightPlotManager::adjustWeightRange()
             maxWeight = std::max(maxWeight, w.value);
         }
 
-        auto ticks = ticksCalculations::niceTicks(minWeight, maxWeight, 10);
+        auto ticks = ticksCalculations::niceTicks(ceil(minWeight - 1.0), floor(maxWeight+ 1.0), 5);
 
         plot_->yAxis->setAutoTickStep(false);
         plot_->yAxis->setTickStep(ticks.tickSpacing);
