@@ -2,6 +2,8 @@
 #include "weightdataprovider.h"
 #include "ticks.h"
 
+#include <QDebug>
+
 namespace weighttracker
 {
 
@@ -130,7 +132,7 @@ void WeightPlotManager::adjustDateRange()
         firstDate = wdm_.getData().front().date;
     }
 
-    auto dateTicks = ticksCalculations::niceTicks(firstDate, lastDate, 5);
+    auto dateTicks = ticksCalculations::niceTicks(firstDate, lastDate, 8);
 
     double minRangeInSeconds = QDateTime(dateTicks.dates.front()).toTime_t();
     double maxRangeInSeconds = QDateTime(dateTicks.dates.back()).toTime_t();
@@ -155,7 +157,8 @@ void WeightPlotManager::adjustDateRange()
     }
     plot_->xAxis->setTickVector(tickVector);
     plot_->xAxis->setTickVectorLabels(tickLabels);
-
+    plot_->xAxis->setAutoSubTicks(false);
+    plot_->xAxis->setSubTickCount(dateTicks.dates[0].daysTo(dateTicks.dates[1])-1);
 }
 
 
@@ -172,7 +175,7 @@ void WeightPlotManager::adjustWeightRange()
             maxWeight = std::max(maxWeight, w.value);
         }
 
-        auto ticks = ticksCalculations::niceTicks(ceil(minWeight - 1.0), floor(maxWeight+ 1.0), 5);
+        auto ticks = ticksCalculations::niceWeightTicks(minWeight, maxWeight, 8);
 
         plot_->yAxis->setAutoTickStep(false);
         plot_->yAxis->setTickStep(ticks.tickSpacing);

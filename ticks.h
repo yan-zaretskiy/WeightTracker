@@ -9,6 +9,7 @@ namespace ticksCalculations {
 extern std::vector<double> niceIntervals;
 extern std::vector<double> intIntervals;
 extern std::vector<double> int12Intervals;
+extern std::vector<double> wgtIntervals;
 
 struct NumTicksData
 {
@@ -23,6 +24,7 @@ NumTicksData niceTicks(double minPoint,
                        std::vector<double>& intervals = niceIntervals,
                        int base = 10);
 
+NumTicksData niceWeightTicks(double minPoint, double maxPoint, int maxTicks);
 
 struct DateTicksData
 {

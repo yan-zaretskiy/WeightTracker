@@ -8,9 +8,10 @@ namespace ticksCalculations {
 
 /****************************** Numerical Ticks *********************************/
 
-std::vector<double> niceIntervals = {1.0, 2.0, 2.5, 3.0, 5.0, 10.0};
-std::vector<double> intIntervals = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
-std::vector<double> int12Intervals = {1.0, 2.0, 3.0, 4.0, 6.0, 12.0};
+vector<double> niceIntervals = {1.0, 2.0, 2.5, 3.0, 5.0, 10.0};
+vector<double> intIntervals = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0};
+vector<double> int12Intervals = {1.0, 2.0, 3.0, 4.0, 6.0, 12.0};
+vector<double> wgtIntervals = {0.5, 1.0, 2.0, 5.0, 10.0};
 
 template<typename T>
 T log(T x, int base)
@@ -75,6 +76,12 @@ NumTicksData niceTicks(double minPoint, double maxPoint, int maxTicks, vector<do
     ticksData.niceMax = ceil(maxPoint / ticksData.tickSpacing) * ticksData.tickSpacing;
 
     return ticksData;
+}
+
+
+NumTicksData niceWeightTicks(double minPoint, double maxPoint, int maxTicks)
+{
+    return niceTicks(ceil(minPoint - 1.0), floor(maxPoint+ 1.0), maxTicks, wgtIntervals);
 }
 
 /********************************* Date Ticks ************************************/
