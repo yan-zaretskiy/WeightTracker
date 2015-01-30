@@ -95,7 +95,8 @@ DateTicksData niceYearTicks(int minYear, int maxYear, int maxTicks)
     DateTicksData dateTicks;
     while (currentDate <= endDate)
     {
-        dateTicks.dates.push_back(currentDate);
+        if (dateTicks.dates.empty() || dateTicks.dates.back() != currentDate)
+            dateTicks.dates.push_back(currentDate);
         int nextYear = static_cast<int>(ticks.niceMin + i * ticks.tickSpacing);
         currentDate = QDate(nextYear, 1, 1);
         ++i;
@@ -118,7 +119,8 @@ DateTicksData niceMonthTicks(int minMonth, int maxMonth, int minYear, int maxYea
     DateTicksData dateTicks;
     while (currentDate <= endDate)
     {
-        dateTicks.dates.push_back(currentDate);
+        if (dateTicks.dates.empty() || dateTicks.dates.back() != currentDate)
+            dateTicks.dates.push_back(currentDate);
         int year = static_cast<int>(minTicksYear + (ticks.niceMin + i * ticks.tickSpacing) / 12);
         int month = static_cast<int>(static_cast<int>(ticks.niceMin + i * ticks.tickSpacing) % 12) + 1;
         currentDate = QDate(year, month, 1);
@@ -138,7 +140,8 @@ DateTicksData niceDayTicks(QDate minDate, int deltaDays, int maxTicks)
     DateTicksData dateTicks;
     while (currentDate <= endDate)
     {
-        dateTicks.dates.push_back(currentDate);
+        if (dateTicks.dates.empty() || dateTicks.dates.back() != currentDate)
+            dateTicks.dates.push_back(currentDate);
         currentDate = minDate.addDays(i * ticks.tickSpacing);
         ++i;
     }
