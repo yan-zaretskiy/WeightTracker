@@ -52,6 +52,11 @@ void WeightPlotManager::setupPlot()
     plot_->xAxis2->setTickLabels(false);
     plot_->yAxis2->setTickLabels(false);
 
+    plot_->xAxis->setAutoSubTicks(false);
+    plot_->yAxis->setAutoTickStep(false);
+    plot_->yAxis->setAutoSubTicks(false);
+    plot_->yAxis->setSubTickCount(0);
+
     weightGraph_ = plot_->addGraph();
     weightGraph_->setName("Weight");
     trendGraph_ = plot_->addGraph();
@@ -137,6 +142,7 @@ void WeightPlotManager::adjustDateRange()
     double minRangeInSeconds = QDateTime(dateTicks.dates.front()).toTime_t();
     double maxRangeInSeconds = QDateTime(dateTicks.dates.back()).toTime_t();
     double dateRange = maxRangeInSeconds - minRangeInSeconds;
+    if (dateTicks.dates.front() == dateTicks.dates.back()) dateRange = minRangeInSeconds;
 
     if (dateTicks.dates.front() == firstDate) minRangeInSeconds -= 0.05 * dateRange;
     if (dateTicks.dates.back() == lastDate) maxRangeInSeconds += 0.05 * dateRange;
@@ -157,32 +163,32 @@ void WeightPlotManager::adjustDateRange()
     }
     plot_->xAxis->setTickVector(tickVector);
     plot_->xAxis->setTickVectorLabels(tickLabels);
-    plot_->xAxis->setAutoSubTicks(false);
-    plot_->xAxis->setSubTickCount(dateTicks.dates[0].daysTo(dateTicks.dates[1])-1);
+    plot_->xAxis->setSubTickCount( dateTicks.dates.size() > 1 ? dateTicks.dates[0].daysTo(dateTicks.dates[1])-1 : 0 );
 }
 
 
 void WeightPlotManager::adjustWeightRange()
 {
+    double minWeight, maxWeight;
     if (wdm_.getData().empty())
-        plot_->yAxis->setRange(50, 90);
+    {
+        minWeight = 50.0;
+        maxWeight = 90.0;
+    }
     else
     {
-        double minWeight = wdm_.at(0).value, maxWeight = wdm_.at(0).value;
+        minWeight = wdm_.at(0).value;
+        maxWeight = wdm_.at(0).value;
         for (auto& w : wdm_.getData())
         {
             minWeight = std::min(minWeight, w.value);
             maxWeight = std::max(maxWeight, w.value);
         }
+    }    
+    auto ticks = ticksCalculations::niceWeightTicks(minWeight, maxWeight, 8);
 
-        auto ticks = ticksCalculations::niceWeightTicks(minWeight, maxWeight, 8);
-
-        plot_->yAxis->setAutoTickStep(false);
-        plot_->yAxis->setTickStep(ticks.tickSpacing);
-        plot_->yAxis->setAutoSubTicks(false);
-        plot_->yAxis->setSubTickCount(0);
-        plot_->yAxis->setRange(ticks.niceMin, ticks.niceMax);
-    }
+    plot_->yAxis->setTickStep(ticks.tickSpacing);
+    plot_->yAxis->setRange(ticks.niceMin, ticks.niceMax);
 }
 
 }
